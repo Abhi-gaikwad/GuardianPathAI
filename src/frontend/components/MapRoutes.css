@@ -1,0 +1,397 @@
+/* 🌍 Full Container with Elegant Transitions */
+.map-wrapper {
+  width: 90%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 40px;
+  text-align: center;
+  transition: all 0.4s ease-in-out;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 🔥 Interactive Expansion */
+.map-wrapper.expanded {
+  transform: scale(1.05);
+}
+
+/* 🏷️ Elegant Heading Style */
+.map-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: inline-block;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🗺️ Map Container */
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: slideIn 1s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.map {
+  width: 100%;
+  height: 500px;
+  border-radius: 15px;
+  border: 2px solid #3b82f6;
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.map:hover {
+  transform: scale(1.02);
+}
+
+/* 📍 Route Details */
+.route-details-container {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+  text-align: left;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.route-details-container:hover {
+  transform: translateY(-5px);
+}
+
+.route-details-container h3 {
+  font-size: 1.8rem;
+  color: #2563eb;
+  text-align: center;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.route-details-container p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.route-details-container ul {
+  padding-left: 20px;
+}
+
+.route-details-container li {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* 🎯 Buttons */
+.complete-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.complete-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.issue-btn {
+  background: #ef4444;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-left: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.issue-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 📝 Feedback Section */
+.feedback-section-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.feedback-section-container:hover {
+  transform: translateY(-5px);
+}
+
+.feedback-section-container h3 {
+  font-size: 1.8rem;
+  color: #2563eb;
+  text-align: center;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.feedback-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feedback-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.feedback-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-item p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.feedback-item img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .map-wrapper {
+    padding: 20px;
+  }
+
+  .map {
+    height: 400px;
+  }
+
+  .route-details-container,
+  .feedback-section-container {
+    width: 95%;
+  }
+
+  .complete-btn,
+  .issue-btn {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* 📍 Route Details */
+.route-details {
+  width: 100%;
+  max-width: 800px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+  text-align: left;
+  animation: fadeInUp 1s ease-in-out;
+  margin: 20px 0;
+}
+
+.route-details:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.route-details h3 {
+  font-size: 1.8rem;
+  color: #2563eb;
+  text-align: center;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.route-details p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.route-details h4 {
+  font-size: 1.2rem;
+  color: #2563eb;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.route-details ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.route-details li {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+/* 📝 Feedback Section */
+.feedback-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.feedback-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-section h3 {
+  font-size: 1.8rem;
+  color: #2563eb;
+  text-align: center;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.feedback-section p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.feedback-section .error {
+  color: #dc2626;
+  font-weight: bold;
+  text-align: center;
+}
+
+.feedback-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feedback-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.feedback-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-item p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.feedback-item strong {
+  color: #2563eb;
+}
+
+.feedback-item img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,251 @@
+/* About Section */
+.about-section {
+  padding: 80px 8%;
+  background: linear-gradient(135deg, #f5faff, #eaf4ff);
+  text-align: center;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Section Header */
+.about-header {
+  margin-bottom: 40px;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: fadeInUp 1s ease-out forwards;
+  background: linear-gradient(135deg, #f5faff, #eaf4ff); /* Gradient background */
+  padding: 30px; /* Padding around the text */
+  border-radius: 20px; /* Rounded corners */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  display: inline-block; /* Ensure the background wraps tightly around the content */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.about-header:hover {
+  transform: scale(1.05); /* Slightly enlarge the section on hover */
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.about-title {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #1a237e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  margin-bottom: 10px; /* Add spacing between title and subtitle */
+}
+
+.about-title::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background-color: #007BFF;
+  margin: 10px auto;
+  border-radius: 5px;
+}
+
+.about-subtitle {
+  font-size: 1.5rem;
+  color: #555;
+  margin-bottom: 0; /* Remove extra margin to fit inside the rounded background */
+}
+
+/* Content Section */
+.about-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.about-text {
+  max-width: 800px;
+  text-align: left;
+  color: #333;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: slideInLeft 1s ease-out forwards 0.5s;
+}
+
+.about-image img {
+  width: 380px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: fadeInScale 1s ease-out forwards 0.5s;
+}
+
+.about-image img:hover {
+  transform: scale(1.05);
+}
+
+/* Features Section */
+.about-features {
+  display: flex; /* Use flexbox for horizontal layout */
+  justify-content: space-between; /* Space between cards */
+  align-items: center; /* Align items vertically */
+  gap: 20px; /* Space between cards */
+  margin-top: 50px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.feature-card {
+  display: flex; /* Flexbox for horizontal content inside the card */
+  align-items: center; /* Center content vertically */
+  background: #ffffff; /* White background */
+  padding: 20px;
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+  width: 100%; /* Full width for responsiveness */
+  max-width: 600px; /* Limit the width of each card */
+  text-align: left; /* Align text to the left */
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  color: #1a237e;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px); /* Lift the card on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.feature-card:hover::before {
+  width: 10px; /* Expand the accent bar on hover */
+}
+
+.feature-card-content {
+  margin-left: 20px; /* Space between the icon and text */
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(135deg, #4faaf7, #f24b21); /* Gradient accent bar */
+  transition: width 0.3s ease; /* Animate the accent bar */
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .about-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-text {
+    max-width: 90%;
+  }
+
+  .about-image img {
+    width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-title {
+    font-size: 2.4rem;
+  }
+
+  .about-subtitle {
+    font-size: 1.3rem;
+  }
+
+  .about-text {
+    font-size: 1.1rem;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-title {
+    font-size: 2rem;
+  }
+
+  .about-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .about-text {
+    font-size: 1rem;
+  }
+
+  .feature-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-features {
+    flex-direction: column; /* Stack cards vertically on smaller screens */
+    gap: 30px; /* Increase gap between stacked cards */
+  }
+
+  .feature-card {
+    max-width: 100%; /* Full width on smaller screens */
+  }
+}

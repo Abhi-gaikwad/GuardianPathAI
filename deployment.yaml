@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travel-safety-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: travel-safety
+  template:
+    metadata:
+      labels:
+        app: travel-safety
+    spec:
+      containers:
+      - name: travel-safety-container
+        image: your-dockerhub-abhijeet127/travel-safety-app:latest  # Use your Docker Hub image here
+        ports:
+        - containerPort: 3000

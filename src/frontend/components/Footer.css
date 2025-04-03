@@ -1,0 +1,127 @@
+.footer-section {
+    background-color: #2C2C2C; /* Dark background for contrast */
+    color: #E0E0E0; /* Light grey text for readability */
+    padding: 30px 20px; /* Reduced padding for a more compact layout */
+    display: flex; /* Flexbox layout */
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items */
+    border-top: 5px solid #3498DB; /* Colorful top border for visual appeal */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+  }
+  
+  .footer-section:hover {
+    transform: translateY(-2px); /* Subtle lift effect on hover */
+  }
+  
+  .footer-content {
+    display: flex; /* Flexbox for footer content */
+    justify-content: space-between; /* Space between items */
+    width: 100%; /* Full width */
+    max-width: 1000px; /* Reduced max width for a tighter layout */
+    margin-bottom: 20px; /* Reduced space below the content */
+  }
+  
+  .footer-logo {
+    flex: 1; /* Flex item */
+    text-align: left; /* Align text to the left */
+  }
+  
+  .footer-logo h3 {
+    font-size: 1.6rem; /* Smaller font size for the logo */
+    margin-bottom: 5px; /* Reduced space below the logo */
+    color: #3498DB; /* Shiny blue color for emphasis */
+    transition: color 0.3s ease; /* Smooth color transition */
+  }
+  
+  .footer-logo p {
+    font-size: 0.9rem; /* Smaller font for description */
+    color: #B0B0B0; /* Softer grey for description */
+  }
+  
+  .footer-contact {
+    flex: 1; /* Flex item */
+    text-align: right; /* Align text to the right */
+  }
+  
+  .footer-contact h4 {
+    margin-bottom: 5px; /* Reduced space below heading */
+    font-size: 1.4rem; /* Slightly smaller font size for contact heading */
+    color: #3498DB; /* Shiny blue color for emphasis */
+  }
+  
+  .footer-contact p {
+    margin: 3px 0; /* Space between paragraphs */
+    font-size: 0.9rem; /* Smaller font size for contact info */
+  }
+  
+  .footer-logo-image {
+    width: 100px; /* Adjust the size as needed */
+    height: auto;
+    margin-bottom: 10px; /* Add spacing below the logo */
+    background: white; /* Background color */
+    border-radius: 50%; /* Makes the background fully rounded */
+    padding: 10px; /* Optional: Add padding around the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+}
+  .footer-contact a {
+    color: #E0E0E0; /* Light grey link color */
+    text-decoration: none; /* No underline */
+    transition: color 0.3s, transform 0.3s; /* Smooth color and transform transitions */
+  }
+  
+  .footer-contact a:hover {
+    color: #1ABC9C; /* Change color on hover for links */
+    transform: scale(1.05); /* Slightly enlarge link on hover */
+  }
+  
+  .footer-social {
+    display: flex; /* Flexbox for social icons */
+    justify-content: center; /* Center the icons */
+    margin: 20px 0; /* Space around social icons */
+  }
+  
+  .footer-social a {
+    margin: 0 10px; /* Space between icons */
+    color: #E0E0E0; /* Icon color */
+    font-size: 1.5rem; /* Icon size */
+    transition: color 0.3s; /* Smooth color transition */
+  }
+  
+  .footer-social a:hover {
+    color: #3498DB; /* Color change on hover */
+  }
+  
+  .footer-bottom {
+    text-align: center; /* Center text */
+    width: 100%; /* Full width */
+    padding-top: 10px; /* Reduced padding for spacing */
+    font-size: 0.8rem; /* Smaller font size for bottom text */
+    color: #B0B0B0; /* Softer grey for bottom text */
+    position: relative; /* Relative positioning for pseudo-elements */
+  }
+  
+  .footer-bottom:before {
+    content: ""; /* Pseudo-element for decorative line */
+    display: block;
+    height: 1px; /* Height of the line */
+    background: #3498DB; /* Color of the line */
+    width: 50%; /* Width of the line */
+    margin: 5px auto; /* Center the line with auto margins */
+  }
+  
+  .footer-bottom p {
+    margin: 0; /* No margin for the bottom text */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column; /* Stack items vertically on smaller screens */
+      align-items: center; /* Center items */
+    }
+    
+    .footer-contact {
+      text-align: center; /* Center text for contact info */
+    }
+  }
+  

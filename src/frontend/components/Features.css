@@ -1,0 +1,121 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f4f4f4;
+}
+
+/* Features Section */
+.features-section {
+  padding: 50px 0;
+  background: linear-gradient(135deg, #f5faff, #eaf4ff);
+  color: #333;
+  text-align: center;
+}
+
+
+.features-section h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #4a4a4a;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.features-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.feature-card {
+  background: #f0dbeb;
+  color: #333;
+  padding: 35px;
+  border-radius: 20px;
+  width: 320px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.25);
+}
+
+.feature-card:hover .icon {
+  color: #ff758c;
+}
+
+.icon {
+  font-size: 3.5rem;
+  color: #ff6b6b;
+  margin-bottom: 25px;
+  transition: color 0.3s ease-in-out;
+}
+
+.feature-card h3 {
+  font-size: 1.7rem;
+  margin-bottom: 15px;
+  color: #4a4a4a;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #666;
+}
+
+/* Card Hover Effect with Gradient Overlay */
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(45deg, rgba(255, 165, 0, 0.5), rgba(255, 182, 193, 0.5));
+  transition: height 0.4s ease-in-out;
+  z-index: 1;
+}
+
+.feature-card:hover::before {
+  height: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-container {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .feature-card {
+    width: 85%;
+    margin: 0 auto;
+  }
+
+  .features-section h2 {
+    font-size: 2.3rem;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

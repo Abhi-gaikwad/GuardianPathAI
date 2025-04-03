@@ -1,0 +1,165 @@
+.feedback-form {
+  background: rgba(255, 255, 255, 0.98);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
+  max-width: 500px;
+  width: 90%;
+  margin: 40px auto;
+  transition: all 0.3s ease-in-out;
+  text-align: center;
+}
+
+.feedback-form h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.feedback-form label {
+  font-weight: 600;
+  color: #444;
+  display: block;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.feedback-form select, 
+.feedback-form input, 
+.feedback-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.feedback-form select:focus, 
+.feedback-form input:focus, 
+.feedback-form textarea:focus {
+  border: 1px solid #007bff;
+  outline: none;
+  box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.3);
+}
+
+.feedback-form textarea {
+  resize: none;
+  height: 100px;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+}
+
+.radio-group input {
+  accent-color: #007bff;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Adjust spacing for different screen sizes */
+@media (max-width: 480px) {
+  .radio-group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+  }
+}
+
+.file-upload {
+  border: 2px dashed #007bff;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.file-upload:hover {
+  border-color: #0056b3;
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.feedback-form .char-count {
+  font-size: 12px;
+  color: #777;
+  text-align: right;
+  margin-top: 3px;
+}
+
+.feedback-form button {
+  width: 100%;
+  margin-top: 20px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+.feedback-form button:hover {
+  background: linear-gradient(90deg, #0056b3, #004494);
+  transform: scale(1.03);
+}
+
+/* 🌍 Responsive Design */
+@media (max-width: 768px) {
+  .feedback-form {
+      width: 95%;
+      padding: 25px;
+  }
+
+  .feedback-form h3 {
+      font-size: 22px;
+  }
+
+  .radio-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .feedback-form button {
+      font-size: 14px;
+      padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedback-form {
+      width: 98%;
+      padding: 20px;
+  }
+
+  .feedback-form h3 {
+      font-size: 20px;
+  }
+
+  .feedback-form button {
+      font-size: 14px;
+      padding: 10px;
+  }
+}
