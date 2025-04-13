@@ -99,7 +99,7 @@ router.post("/feedbacks", async (req, res) => {
 });
 
 // ✅ GET All Feedback
-router.get("/api/feedbacks", async (req, res) => {
+router.get("/feedbacks", async (req, res) => {
   try {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 });
     res.json(feedbacks);

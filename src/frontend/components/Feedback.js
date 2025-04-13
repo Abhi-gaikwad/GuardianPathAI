@@ -18,6 +18,7 @@ const Feedback = () => {
       setError(null);
       const response = await axios.get("http://localhost:5000/api/feedbacks");
       setFeedbackList(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("❌ Failed to load feedback:", error);
       setError("Failed to fetch feedback. Please try again.");

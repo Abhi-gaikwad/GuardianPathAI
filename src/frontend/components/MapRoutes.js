@@ -314,7 +314,6 @@ const MapRoutes = ({ source, destination, userChoice }) => {
         await fetchRoutes(false);
         handleStartJourney();
       }
-      // await checkFeedbackAvailability();
     };
     
     initializeRoute();
@@ -406,20 +405,23 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       setLoadingFeedback(true);
       setFeedbackError("");
   
-      // ✅ Fetch all feedback without filtering
-      const response = await axios.get("http://localhost:5000/api/feedback");
+      const response = await axios.get("http://localhost:5000/api/feedback", {
+        params: {
+          source: source,
+          destination: destination
+        }
+      });
   
       setFeedbackList(response.data);
       setHasFeedback(response.data.length > 0);
     } catch (err) {
-      console.error("❌ Feedback fetch error:", err);
+      console.error("Feedback fetch error:", err);
       setFeedbackError(err.response?.data?.message || "Failed to load feedback");
       setHasFeedback(false);
     } finally {
       setLoadingFeedback(false);
     }
   };
-  
 
   const markerIcon = (iconUrl) =>
     new L.Icon({
@@ -453,6 +455,12 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       console.error("Feedback submit error:", err);
       setFeedbackError("Failed to submit feedback");
     }
+  };
+
+  const getCrimeRateLevel = (rate) => {
+    if (rate === 0) return 'Low';
+    if (rate <= 3) return 'Moderate';
+    return 'High';
   };
 
   return (
@@ -513,7 +521,7 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       </div>
 
       <div className="feedback-section">
-        <h3>Journey Reviews</h3>
+        <h3>Journey Reviews: {source} to {destination}</h3>
         {loadingFeedback ? (
           <div className="loading-message">Loading reviews...</div>
         ) : feedbackError ? (
@@ -523,9 +531,6 @@ const MapRoutes = ({ source, destination, userChoice }) => {
             {feedbackList.map((feedback) => (
               <div key={feedback._id} className="feedback-item">
                 <div className="feedback-header">
-                  <span className="route-info">
-                    {feedback.source} to {feedback.destination}
-                  </span>
                   <span className="feedback-date">
                     {new Date(feedback.createdAt).toLocaleDateString()}
                   </span>
@@ -540,12 +545,12 @@ const MapRoutes = ({ source, destination, userChoice }) => {
                   </div>
                   
                   <div className="metric">
-                    <span className="metric-label">Traffic:</span>
+                    <span className="metric-label">Traffic Density:</span>
                     <span className="metric-value">{feedback.trafficDensity}%</span>
                   </div>
                   
                   <div className="metric">
-                    <span className="metric-label">Safety:</span>
+                    <span className="metric-label">Road Quality:</span>
                     <span className="metric-value">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <span 
@@ -557,19 +562,28 @@ const MapRoutes = ({ source, destination, userChoice }) => {
                       ))}
                     </span>
                   </div>
+
+                  <div className="metric">
+                    <span className="metric-label">Safest Time:</span>
+                    <span className="metric-value">{feedback.safestTime}</span>
+                  </div>
+
+                  <div className="metric">
+                    <span className="metric-label">Crime Rate:</span>
+                    <span className="metric-value">
+                      {getCrimeRateLevel(feedback.crimeRate)}
+                    </span>
+                  </div>
                 </div>
                 
                 {feedback.accidentOccurred && (
                   <div className="accident-info">
-                    <p><strong>⚠️ Accident Reported:</strong> {feedback.accidentCount} incident(s)</p>
-                    {feedback.accidentDescription && (
-                      <p className="accident-details">{feedback.accidentDescription}</p>
-                    )}
+                    <p><strong>⚠️ Accident Occurred:</strong> {feedback.accidentCount} incident(s)</p>
                   </div>
                 )}
                 
                 <div className="user-review">
-                  <p><strong>Review:</strong></p>
+                  <p><strong>User Review:</strong></p>
                   <p className="review-text">{feedback.review}</p>
                 </div>
               </div>
@@ -577,7 +591,7 @@ const MapRoutes = ({ source, destination, userChoice }) => {
           </div>
         ) : (
           <div className="no-reviews">
-            No reviews available for this route yet.
+            No reviews available for this route yet. Be the first to share your experience!
           </div>
         )}
       </div>
