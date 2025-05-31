@@ -5,7 +5,7 @@ import SignUp from './frontend/components/signup';
 import Dashboard from './frontend/components/Dashboard'; // New Dashboard Component
 import Profile from './frontend/components/Profile.jsx'
 
-
+// Importing necessary components for routing
 function App() {
   return (
     <Router>
