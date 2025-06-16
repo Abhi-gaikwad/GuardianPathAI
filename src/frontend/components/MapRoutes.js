@@ -308,9 +308,10 @@ const MapRoutes = ({ source, destination, userChoice }) => {
     const initializeRoute = async () => {
       if (userChoice === "showRoutes") {
         await fetchRoutes(true);
+        // Don't set journeyStarted here - we just want to show routes
       } else if (userChoice === "startJourney") {
         await fetchRoutes(false);
-        handleStartJourney();
+        handleStartJourney(); // This will set journeyStarted to true
       }
     };
     
@@ -506,34 +507,36 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       <h2 className="map-heading">Route Planner: {source} to {destination}</h2>
 
       <div className="map-container">
-        <MapContainer 
-          center={sourceCoords || [18.5204, 73.8567]} 
-          zoom={sourceCoords ? 10 : 12} 
-          className="map"
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        // In MapRoutes component, modify the MapContainer section:
+      <MapContainer 
+        center={sourceCoords || [18.5204, 73.8567]} 
+        zoom={sourceCoords ? 10 : 12} 
+        className="map"
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {journeyStarted && routes.map((route, index) => (
-            <Polyline 
-              key={index} 
-              positions={route} 
-              color={index === 0 ? "blue" : "gray"} 
-              weight={4}
-            />
-          ))}
+        {/* Show routes if either journeyStarted OR user chose showRoutes */}
+        {(journeyStarted || userChoice === "showRoutes") && routes.map((route, index) => (
+          <Polyline 
+            key={index} 
+            positions={route} 
+            color={index === 0 ? "blue" : "gray"} 
+            weight={4}
+          />
+        ))}
 
-          {sourceCoords && (
-            <Marker position={sourceCoords} icon={markerIcon(source_icon)}>
-              <Popup>Source: {source}</Popup>
-            </Marker>
-          )}
+        {sourceCoords && (
+          <Marker position={sourceCoords} icon={markerIcon(source_icon)}>
+            <Popup>Source: {source}</Popup>
+          </Marker>
+        )}
 
-          {destinationCoords && (
-            <Marker position={destinationCoords} icon={markerIcon(destination_icon)}>
-              <Popup>Destination: {destination}</Popup>
-            </Marker>
-          )}
-        </MapContainer>
+        {destinationCoords && (
+          <Marker position={destinationCoords} icon={markerIcon(destination_icon)}>
+            <Popup>Destination: {destination}</Popup>
+          </Marker>
+        )}
+      </MapContainer>
 
         <div className="route-details">
           <h3>Route Details</h3>
