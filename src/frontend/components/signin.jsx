@@ -1,10 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkExistingSession = () => {
+      const storedSession = localStorage.getItem('userSession');
+      const sessionExpiry = localStorage.getItem('sessionExpiry');
+      
+      if (storedSession && sessionExpiry) {
+        const currentTime = new Date().getTime();
+        const expiryTime = parseInt(sessionExpiry);
+        
+        if (currentTime < expiryTime) {
+          // Session is still valid
+          const sessionData = JSON.parse(storedSession);
+          console.log('Valid session found, redirecting to dashboard');
+          navigate(`/dashboard/${sessionData.uniqueId}`);
+        } else {
+          // Session expired, clear storage
+          localStorage.removeItem('userSession');
+          localStorage.removeItem('sessionExpiry');
+          console.log('Session expired, cleared storage');
+        }
+      }
+    };
+
+    checkExistingSession();
+  }, [navigate]);
+
+  const storeSession = (userData, remember = false) => {
+    const sessionData = {
+      uniqueId: userData.uniqueId,
+      email: userData.email,
+      name: userData.name,
+      loginTime: new Date().toISOString()
+    };
+
+    // Set session duration: 7 days if remember me, 1 day otherwise
+    const sessionDuration = remember ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+    const expiryTime = new Date().getTime() + sessionDuration;
+
+    localStorage.setItem('userSession', JSON.stringify(sessionData));
+    localStorage.setItem('sessionExpiry', expiryTime.toString());
+    
+    console.log('Session stored:', {
+      data: sessionData,
+      expiresAt: new Date(expiryTime).toLocaleString(),
+      duration: remember ? '7 days' : '1 day'
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +70,8 @@ const SignIn = () => {
   
       const data = await response.json();
       if (response.ok) {
+        // Store session before navigation
+        storeSession(data, rememberMe);
         navigate(`/dashboard/${data.uniqueId}`);
       } else {
         alert(data.message || 'Sign-in failed');
@@ -76,7 +128,12 @@ const SignIn = () => {
           
           <div style={styles.extraOptions}>
             <label style={styles.checkboxLabel}>
-              <input type="checkbox" style={styles.checkbox} />
+              <input 
+                type="checkbox" 
+                style={styles.checkbox}
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
               <span style={styles.checkboxText}>Remember me</span>
             </label>
             <a href="#" style={styles.forgotLink}>Forgot password?</a>

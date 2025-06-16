@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -6,10 +6,36 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
-
   const [mobile, setMobile] = useState('');
   const [emergencyMobile, setEmergencyMobile] = useState('');
+  const navigate = useNavigate();
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkExistingSession = () => {
+      const storedSession = localStorage.getItem('userSession');
+      const sessionExpiry = localStorage.getItem('sessionExpiry');
+      
+      if (storedSession && sessionExpiry) {
+        const currentTime = new Date().getTime();
+        const expiryTime = parseInt(sessionExpiry);
+        
+        if (currentTime < expiryTime) {
+          // Session is still valid, redirect to dashboard
+          const sessionData = JSON.parse(storedSession);
+          console.log('Valid session found, redirecting to dashboard');
+          navigate(`/dashboard/${sessionData.uniqueId}`);
+        } else {
+          // Session expired, clear storage
+          localStorage.removeItem('userSession');
+          localStorage.removeItem('sessionExpiry');
+          console.log('Session expired, cleared storage');
+        }
+      }
+    };
+
+    checkExistingSession();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +56,7 @@ const SignUp = () => {
   
       const data = await response.json();
       if (response.ok) {
+        console.log('Account created successfully');
         navigate("/signin");
       } else {
         alert(data.message || "Sign up failed!");
