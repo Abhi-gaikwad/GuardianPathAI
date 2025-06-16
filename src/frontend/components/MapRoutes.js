@@ -507,7 +507,7 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       <h2 className="map-heading">Route Planner: {source} to {destination}</h2>
 
       <div className="map-container">
-        // In MapRoutes component, modify the MapContainer section:
+        {/* // In MapRoutes component, modify the MapContainer section: */}
       <MapContainer 
         center={sourceCoords || [18.5204, 73.8567]} 
         zoom={sourceCoords ? 10 : 12} 
