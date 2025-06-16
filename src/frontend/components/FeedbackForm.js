@@ -52,7 +52,7 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
       onFeedbackSubmit();
     } catch (error) {
       console.error("❌ Failed to submit feedback:", error.response?.data || error.message);
-      alert("Failed to submit feedback. Please try again.");
+      // alert("Failed to submit feedback. Please try again.");
     } finally {
       setLoading(false);
     }

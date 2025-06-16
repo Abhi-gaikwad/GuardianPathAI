@@ -73,6 +73,7 @@
 //         `https://api.openrouteservice.org/v2/directions/driving-car/geojson`,
 //         {
 //           coordinates: [srcCoords.reverse(), destCoords.reverse()],
+
 //           alternative_routes: { target_count: 3, weight_factor: 1.3 },
 //         },
 //         { headers: { Authorization: API_KEY, "Content-Type": "application/json" } }
@@ -113,23 +114,20 @@
 //   const fetchFeedback = async () => {
 //     try {
 //       setLoadingFeedback(true);
-//       setFeedbackError(null);
-      
-//       const response = await axios.get(
-//         `http://localhost:5000/api/feedback/${encodeURIComponent(source)}/${encodeURIComponent(destination)}`,
-//         {
-//           params: {
-//             sort: 'newest',
-//             limit: 10 // Optional: limit number of results
-//           }
-//         }
-//       );
-      
+//       setFeedbackError("");
+//       if (!source || !destination) {
+//         setFeedbackList([]);
+//         setHasFeedback(false);
+//         setLoadingFeedback(false);
+//         return;
+//       }
+//       const response = await axios.get("http://localhost:5000/api/feedbacks", {
+//         params: { source, destination }
+//       });
 //       setFeedbackList(response.data);
 //       setHasFeedback(response.data.length > 0);
 //     } catch (err) {
-//       console.error("Error fetching feedback:", err);
-//       setFeedbackError(err.response?.data?.message || "Failed to load feedback");
+//       setFeedbackError("Failed to load feedback");
 //       setHasFeedback(false);
 //     } finally {
 //       setLoadingFeedback(false);
@@ -320,10 +318,15 @@ const MapRoutes = ({ source, destination, userChoice }) => {
   }, [source, destination, userChoice]);
 
   useEffect(() => {
-    if (journeyCompleted) {
+    // Only fetch feedback if both source and destination are provided
+    if (source && destination) {
       fetchFeedback();
+    } else {
+      setFeedbackList([]);
+      setHasFeedback(false);
+      setFeedbackError("");
     }
-  }, [journeyCompleted]);
+  }, [source, destination]);
 
   const getCoordinates = async (place, type) => {
     try {
@@ -404,25 +407,35 @@ const MapRoutes = ({ source, destination, userChoice }) => {
     try {
       setLoadingFeedback(true);
       setFeedbackError("");
-  
-      const response = await axios.get("http://localhost:5000/api/feedback", {
-        params: {
-          source: source,
-          destination: destination
+      
+      if (!source || !destination) {
+        setFeedbackList([]);
+        setHasFeedback(false);
+        return;
+      }
+
+      const response = await axios.get("http://localhost:5000/api/feedbacks", {
+        params: { 
+          source: source.trim(),
+          destination: destination.trim()
         }
       });
-  
+      
       setFeedbackList(response.data);
       setHasFeedback(response.data.length > 0);
     } catch (err) {
-      console.error("Feedback fetch error:", err);
-      setFeedbackError(err.response?.data?.message || "Failed to load feedback");
+      setFeedbackError("Failed to load feedback for this route");
       setHasFeedback(false);
+      setFeedbackList([]);
     } finally {
       setLoadingFeedback(false);
     }
   };
 
+  // Call this whenever source or destination changes
+  useEffect(() => {
+    fetchFeedback();
+  }, [source, destination]);
   const markerIcon = (iconUrl) =>
     new L.Icon({
       iconUrl,
@@ -444,16 +457,41 @@ const MapRoutes = ({ source, destination, userChoice }) => {
 
   const handleFeedbackSubmit = async (feedbackData) => {
     try {
-      await axios.post("http://localhost:5000/api/feedback", {
+      console.log("📤 Submitting feedback:", feedbackData);
+      
+      // Submit feedback to the correct endpoint
+      const response = await axios.post("http://localhost:5000/api/feedbacks", {
         ...feedbackData,
         source,
         destination
       });
-      await fetchFeedback();
+      
+      console.log("✅ Feedback submitted successfully:", response.data);
+      
+      // Reset states immediately after successful submission
       setJourneyCompleted(false);
+      setFeedbackError(""); // Clear any previous errors
+      
+      // Fetch feedback after successful submission
+      await fetchFeedback();
+      
     } catch (err) {
-      console.error("Feedback submit error:", err);
-      setFeedbackError("Failed to submit feedback");
+      console.error("❌ Feedback submit error:", err);
+      console.error("Error details:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      
+      // Only set error if it's actually a failed request (not a successful one)
+      if (err.response?.status >= 400) {
+        setFeedbackError(
+          err.response?.data?.error || 
+          "Failed to submit feedback. Please try again."
+        );
+      } else {
+        // If it's not actually an error (like a 201 success), clear the error
+        setFeedbackError("");
+        setJourneyCompleted(false);
+        await fetchFeedback();
+      }
     }
   };
 
