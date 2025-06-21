@@ -77,13 +77,13 @@ const Welcome = ({ setSource, setDestination, handleUserChoice }) => {
         <div className="location-inputs">
           <input
             type="text"
-            placeholder="Enter starting location"
+            placeholder="Source Location"
             value={startLocation}
             onChange={(e) => setStartLocation(e.target.value)}
           />
           <input
             type="text"
-            placeholder="Enter destination"
+            placeholder="Destination Location"
             value={endLocation}
             onChange={(e) => setEndLocation(e.target.value)}
           />

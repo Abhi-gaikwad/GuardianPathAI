@@ -3,10 +3,67 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import "./IssueHandler.css";
 
-const IssueHandler = ({ source, destination, onClose }) => {
+const IssueHandler = ({ destination, onClose }) => {
   const [selectedIssue, setSelectedIssue] = useState("");
   const [emergencyMobile, setEmergencyMobile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [liveLocation, setLiveLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(true);
+
+  // Load theme preference and listen for theme changes
+  useEffect(() => {
+    const loadTheme = () => {
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      
+      if (savedTheme) {
+        setDarkMode(savedTheme === "dark");
+      } else if (prefersDark) {
+        setDarkMode(true);
+      } else {
+        setDarkMode(false);
+      }
+    };
+
+    loadTheme();
+
+    // Listen for theme changes from navbar
+    const handleThemeChange = (event) => {
+      setDarkMode(event.detail.theme === "dark");
+    };
+
+    window.addEventListener('themeChanged', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
+  }, []);
+
+  // Get live location
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      setLocationLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLiveLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setLocationLoading(false);
+        },
+        (error) => {
+          console.error("Error getting geolocation:", error);
+          setLiveLocation(null);
+          setLocationLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+      );
+    } else {
+      console.warn("Geolocation not supported");
+      setLocationLoading(false);
+    }
+  }, []);
 
   // Get the user's emergency contact from backend
   useEffect(() => {
@@ -96,8 +153,15 @@ const IssueHandler = ({ source, destination, onClose }) => {
   };
 
   const sendWhatsAppAlert = () => {
-    const locationLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(source)}+to+${encodeURIComponent(destination)}`;
-    const message = `🚨 *Safety Alert!* 🚨\n\nThere is a safety concern between:\n\n🔹 *Source:* ${source}\n🔹 *Destination:* ${destination}\n\n📍 Location: ${locationLink}\n\nPlease take necessary precautions!`;
+    const liveLocLink = liveLocation
+      ? `https://www.google.com/maps?q=${liveLocation.lat},${liveLocation.lng}`
+      : "Location unavailable";
+
+    const liveLocationText = liveLocation
+      ? `${liveLocation.lat.toFixed(6)}, ${liveLocation.lng.toFixed(6)}`
+      : "Location unavailable";
+
+    const message = `🚨 *Safety Alert!* 🚨\n\nThere is a safety concern from your current location:\n\n🔹 *Current Location:* ${liveLocationText}\n🔹 *Destination:* ${destination}\n\n📍 Live Location Link: ${liveLocLink}\n\nPlease take necessary precautions!`;
 
     let emergencyContactURL = null;
     let emergencyContactNumber = null;
@@ -142,55 +206,172 @@ const IssueHandler = ({ source, destination, onClose }) => {
     sendMessages();
   };
 
+  const issueOptions = [
+    { value: "Path Not Found", icon: "🚧", label: "Path Not Found" },
+    { value: "Alert Safety", icon: "⚠️", label: "Safety Alert" },
+    { value: "Incorrect Route", icon: "🔄", label: "Incorrect Route" },
+    { value: "Traffic Issue", icon: "🚦", label: "Traffic Issue" },
+  ];
+
   return (
-    <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50">
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          className="bg-gradient-to-r from-blue-500 to-blue-700 w-full max-w-md p-8 rounded-2xl shadow-2xl border border-gray-300 dark:border-gray-700 relative text-white"
+    <div className={`issue-handler-overlay ${darkMode ? 'dark' : 'light'}`}>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.8, opacity: 0, y: 50 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className={`issue-handler-modal ${darkMode ? 'dark' : 'light'}`}
+      >
+        {/* Close Button */}
+        <button 
+          onClick={onClose} 
+          className={`issue-handler-close-btn ${darkMode ? 'dark' : 'light'}`}
+          aria-label="Close modal"
         >
-          <button onClick={onClose} className="cancel-icon-btn">✖</button>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
 
-          <h3 className="text-2xl font-semibold text-center">🚨 Report an Issue</h3>
-          <p className="text-lg text-gray-200 text-center mb-6">
-            Select an issue and help us improve safety.
-          </p>
-
-          {isLoading && (
-            <div className="text-center mb-4">
-              <p className="text-yellow-200">⏳ Loading emergency contact...</p>
-            </div>
-          )}
-
-          <div className="relative">
-            <select
-              value={selectedIssue}
-              onChange={(e) => setSelectedIssue(e.target.value)}
-              className="custom-select-dropdown"
-              disabled={isLoading}
-            >
-              <option value="" disabled>
-                {isLoading ? "Loading..." : "Select an issue"}
-              </option>
-              <option value="Path Not Found">🚧 Path Not Found</option>
-              <option value="Alert Safety">⚠️ Safety Alert</option>
-              <option value="Incorrect Route">🔄 Incorrect Route</option>
-              <option value="Traffic Issue">🚦 Traffic Issue</option>
-            </select>
+        {/* Header */}
+        <div className="issue-handler-header">
+          <div className="issue-handler-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
+          <h2 className="issue-handler-title">Report an Issue</h2>
+          <p className="issue-handler-subtitle">
+            Help us improve your travel experience by reporting any issues you encounter.
+          </p>
+        </div>
 
-          <button 
-            onClick={handleSubmit} 
-            className="custom-submit-btn"
-            disabled={isLoading && selectedIssue === "Alert Safety"}
+        {/* Route Info */}
+        <div className={`route-info ${darkMode ? 'dark' : 'light'}`}>
+          <div className="route-item">
+            <span className="route-label">Current Location:</span>
+            <span className="route-value">
+              {locationLoading ? (
+                <span className="location-loading">Getting location...</span>
+              ) : liveLocation ? (
+                <span className="location-coords">
+                  {liveLocation.lat.toFixed(4)}, {liveLocation.lng.toFixed(4)}
+                </span>
+              ) : (
+                <span className="location-unavailable">Location unavailable</span>
+              )}
+            </span>
+          </div>
+          <div className="route-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="route-item">
+            <span className="route-label">To:</span>
+            <span className="route-value">{destination}</span>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {(isLoading || locationLoading) && (
+          <div className={`loading-state ${darkMode ? 'dark' : 'light'}`}>
+            <div className="loading-spinner"></div>
+            <p>
+              {isLoading && locationLoading 
+                ? "Loading emergency contact and location..." 
+                : isLoading 
+                ? "Loading emergency contact information..." 
+                : "Getting your current location..."}
+            </p>
+          </div>
+        )}
+
+        {/* Issue Selection */}
+        <div className="issue-selection">
+          <label className="issue-label">Select Issue Type:</label>
+          <div className="issue-options">
+            {issueOptions.map((option) => (
+              <motion.button
+                key={option.value}
+                type="button"
+                onClick={() => setSelectedIssue(option.value)}
+                className={`issue-option ${selectedIssue === option.value ? 'selected' : ''} ${darkMode ? 'dark' : 'light'}`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={isLoading && option.value === "Alert Safety"}
+              >
+                <span className="issue-option-icon">{option.icon}</span>
+                <span className="issue-option-text">{option.label}</span>
+                {selectedIssue === option.value && (
+                  <motion.div
+                    layoutId="selectedIndicator"
+                    className="selected-indicator"
+                    initial={false}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </motion.div>
+                )}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {/* Emergency Contact Info */}
+        {selectedIssue === "Alert Safety" && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`emergency-info ${darkMode ? 'dark' : 'light'}`}
           >
-            {isLoading && selectedIssue === "Alert Safety" ? "Loading..." : "Report Issue"}
-          </button>
-        </motion.div>
-      </div>
-    </>
+            {emergencyMobile ? (
+              <div className="emergency-contact-display">
+                <span className="emergency-icon">📞</span>
+                <span>Emergency contact: {emergencyMobile}</span>
+              </div>
+            ) : (
+              <div className="emergency-warning">
+                <span className="warning-icon">⚠️</span>
+                <span>No emergency contact found. Please update your profile.</span>
+              </div>
+            )}
+            {!liveLocation && !locationLoading && (
+              <div className="emergency-warning" style={{ marginTop: '0.5rem' }}>
+                <span className="warning-icon">📍</span>
+                <span>Location access denied. Safety alert will be sent without location.</span>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Submit Button */}
+        <motion.button
+          onClick={handleSubmit}
+          disabled={!selectedIssue || (isLoading && selectedIssue === "Alert Safety") || (locationLoading && selectedIssue === "Alert Safety")}
+          className={`issue-handler-submit-btn ${darkMode ? 'dark' : 'light'} ${!selectedIssue ? 'disabled' : ''}`}
+          whileHover={selectedIssue ? { scale: 1.02 } : {}}
+          whileTap={selectedIssue ? { scale: 0.98 } : {}}
+        >
+          {((isLoading || locationLoading) && selectedIssue === "Alert Safety") ? (
+            <>
+              <div className="button-spinner"></div>
+              Loading...
+            </>
+          ) : (
+            <>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Report Issue
+            </>
+          )}
+        </motion.button>
+      </motion.div>
+    </div>
   );
 };
 

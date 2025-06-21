@@ -17,6 +17,7 @@ import icon from './assets/travelsafe_logo.png';
 const Footer = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [email, setEmail] = useState('');
+  const [clickedSocial, setClickedSocial] = useState('');
 
   // Handle scroll to top visibility
   useEffect(() => {
@@ -45,6 +46,74 @@ const Footer = () => {
       alert('Thank you for subscribing to our newsletter!');
       setEmail('');
     }
+  };
+
+  // Handle social media clicks
+  const handleSocialClick = (platform, e) => {
+    e.preventDefault();
+    
+    // Add visual feedback
+    setClickedSocial(platform);
+    
+    // Show a brief message
+    const messages = {
+      facebook: 'Stay tuned! Facebook page launching shortly.! 📘',
+      twitter: 'We’ll be tweeting soon! 🐦',
+      instagram: 'We’ll be on the gram soon! 📸',
+      linkedin: 'Our professional page goes live soon! 💼'
+      // youtube: 'Subscribing to our YouTube! 🎥',
+      // telegram: 'Joining our Telegram! 💬'
+    };
+    
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 500;
+      animation: slideIn 0.3s ease-out;
+    `;
+    
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    notification.textContent = messages[platform];
+    document.body.appendChild(notification);
+    
+    // Remove notification and refresh after 2 seconds
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease-out';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+        document.head.removeChild(style);
+        // Refresh the page smoothly
+        // window.location.reload();
+      }, 300);
+    }, 2000);
+    
+    // Reset clicked state
+    setTimeout(() => {
+      setClickedSocial('');
+    }, 200);
   };
 
   // Animation observer for footer elements
@@ -128,27 +197,51 @@ const Footer = () => {
           <div className="footer-social-section">
             <h4>Follow Us</h4>
             <div className="footer-social">
-              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('facebook', e)} 
+                className={`social-link ${clickedSocial === 'facebook' ? 'clicked' : ''}`}
+              >
                 <FaFacebookF className="social-icon" />
                 <span>Facebook</span>
               </a>
-              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('twitter', e)} 
+                className={`social-link ${clickedSocial === 'twitter' ? 'clicked' : ''}`}
+              >
                 <FaTwitter className="social-icon" />
                 <span>Twitter</span>
               </a>
-              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('instagram', e)} 
+                className={`social-link ${clickedSocial === 'instagram' ? 'clicked' : ''}`}
+              >
                 <FaInstagram className="social-icon" />
                 <span>Instagram</span>
               </a>
-              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('linkedin', e)} 
+                className={`social-link ${clickedSocial === 'linkedin' ? 'clicked' : ''}`}
+              >
                 <FaLinkedinIn className="social-icon" />
                 <span>LinkedIn</span>
               </a>
-              {/* <a href="https://youtube.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              {/* <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('youtube', e)} 
+                className={`social-link ${clickedSocial === 'youtube' ? 'clicked' : ''}`}
+              >
                 <FaYoutube className="social-icon" />
                 <span>YouTube</span>
               </a>
-              <a href="https://t.me/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a 
+                href="#" 
+                onClick={(e) => handleSocialClick('telegram', e)} 
+                className={`social-link ${clickedSocial === 'telegram' ? 'clicked' : ''}`}
+              >
                 <FaTelegram className="social-icon" />
                 <span>Telegram</span>
               </a> */}
@@ -183,12 +276,13 @@ const Footer = () => {
             <p className="copyright-text">
               &copy; {currentYear} TravelSafe. All Rights Reserved.
             </p>
-            <div className="footer-bottom-links">
-              <a href="/#">Privacy Policy</a>
-              <a href="/#">Terms of Service</a>
-              <a href="/#">Cookie Policy</a>
-              <a href="/#">Sitemap</a>
-            </div>
+           <div className="footer-bottom-links">
+  <a href="#" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
+  <a href="#" onClick={(e) => e.preventDefault()}>Terms of Service</a>
+  <a href="#" onClick={(e) => e.preventDefault()}>Cookie Policy</a>
+  <a href="#" onClick={(e) => e.preventDefault()}>Sitemap</a>
+</div>
+
           </div>
         </div>
       </div>
@@ -201,6 +295,15 @@ const Footer = () => {
       >
         <FaArrowUp />
       </button>
+
+      {/* Add custom styles for clicked effect */}
+      <style jsx>{`
+        .social-link.clicked {
+          transform: scale(0.95);
+          opacity: 0.8;
+          transition: all 0.1s ease;
+        }
+      `}</style>
     </footer>
   );
 };
