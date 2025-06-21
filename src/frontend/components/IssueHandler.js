@@ -6,136 +6,142 @@ import "./IssueHandler.css";
 const IssueHandler = ({ source, destination, onClose }) => {
   const [selectedIssue, setSelectedIssue] = useState("");
   const [emergencyMobile, setEmergencyMobile] = useState(null);
-  const [showContactChoice, setShowContactChoice] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get the user's emergency contact from backend
   useEffect(() => {
-    const fetchEmergencyContact = async () => {
+    const fetchUserData = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        setIsLoading(true);
         
-        // Get uniqueId from localStorage
-        const uniqueId = localStorage.getItem("uniqueId");
-        console.log("Fetching emergency contact for uniqueId:", uniqueId);
+        // Try to get uniqueId from different possible localStorage keys
+        let uniqueId = localStorage.getItem("uniqueId");
+        let sessionData = null;
         
-        // Check if uniqueId exists
+        // If not found, try to get it from userSession
         if (!uniqueId) {
-          console.error("No uniqueId found in localStorage");
-          setError("User not authenticated. Please log in again.");
-          setLoading(false);
+          const userSession = localStorage.getItem("userSession");
+          if (userSession) {
+            try {
+              sessionData = JSON.parse(userSession);
+              uniqueId = sessionData.uniqueId || sessionData.userId || sessionData.id;
+              console.log("Found uniqueId in userSession:", uniqueId);
+            } catch (error) {
+              console.error("Error parsing userSession:", error);
+            }
+          }
+        }
+        
+        if (!uniqueId) {
+          console.error("No uniqueId found in localStorage or userSession");
+          setIsLoading(false);
           return;
         }
 
-        // Make API call with proper error handling
-        const response = await axios.get(`http://localhost:5000/user/profile/${uniqueId}`);
+        const response = await axios.get(`http://localhost:5000/api/users/profile/${uniqueId}`);
+        console.log("API Response status:", response.status);
         
-        console.log("Full API response:", response.data);
-        console.log("Emergency contact fetched:", response.data.emergencyMobile);
-        
-        // Set emergency mobile with proper validation
-        if (response.data && response.data.emergencyMobile) {
-          setEmergencyMobile(response.data.emergencyMobile);
-          console.log("Emergency mobile set successfully:", response.data.emergencyMobile);
+        // Check emergency mobile
+        const emergencyContact = response.data.emergencyMobile;
+        if (emergencyContact && emergencyContact.toString().trim() !== "") {
+          setEmergencyMobile(emergencyContact.toString().trim());
+          console.log("Emergency mobile set successfully:", emergencyContact);
         } else {
-          console.warn("No emergency mobile found in response");
+          console.log("No valid emergency mobile found");
           setEmergencyMobile(null);
         }
-        
       } catch (error) {
-        console.error("Failed to fetch emergency contact:", error);
-        
-        // Handle specific error cases
-        if (error.response) {
-          // Server responded with error status
-          console.error("API Error:", error.response.status, error.response.data);
-          setError(`API Error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
-        } else if (error.request) {
-          // Request was made but no response received
-          console.error("Network Error:", error.request);
-          setError("Network error. Please check your connection.");
-        } else {
-          // Something else happened
-          console.error("Unexpected Error:", error.message);
-          setError(`Unexpected error: ${error.message}`);
+        console.error("Error fetching user data:", error);
+        console.error("Error response:", error.response?.data);
+        if (error.response?.status === 401) {
+          console.error("Unauthorized access - user may need to login again");
         }
-        
-        setEmergencyMobile(null);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
+    
+    fetchUserData();
+  }, []);
 
-    fetchEmergencyContact();
-  }, []); // Empty dependency array to run only on mount
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedIssue) {
       alert("⚠️ Please select an issue before submitting!");
       return;
     }
 
     if (selectedIssue === "Alert Safety") {
-      console.log("Safety alert selected. Emergency mobile:", emergencyMobile);
-      
-      if (loading) {
-        alert("⏳ Still loading user data. Please wait a moment.");
+      // Wait for user data to load if it's still loading
+      if (isLoading) {
+        alert("⏳ Please wait while we load your emergency contact information...");
         return;
       }
-
-      if (error) {
-        alert(`❌ Error loading user data: ${error}\nPlease refresh and try again.`);
-        return;
-      }
-
-      if (emergencyMobile && emergencyMobile.trim() !== '') {
-        console.log("Sending alert to emergency contact:", emergencyMobile);
-        sendWhatsAppAlert([emergencyMobile]);
-      } else {
-        alert("❌ No emergency contact found! Please add an emergency contact in your profile.");
-        return;
-      }
+      sendWhatsAppAlert();
     } else {
       alert(`🚧 Issue reported: ${selectedIssue}\n\nWe will investigate and resolve it soon!`);
-      onClose();
     }
+
+    onClose();
   };
 
-  const sendWhatsAppAlert = (phoneNumbers) => {
+  // Function to format phone number for WhatsApp
+  const formatPhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return null;
+    
+    // Convert to string and remove all non-numeric characters
+    let cleaned = phoneNumber.toString().replace(/\D/g, '');
+    
+    // If the number starts with 0, remove it (for Indian numbers)
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+    
+    // If the number doesn't start with country code, add 91 (for India)
+    if (cleaned.length === 10 && !cleaned.startsWith('91')) {
+      cleaned = '91' + cleaned;
+    }
+    
+    console.log("Original phone number:", phoneNumber);
+    console.log("Formatted phone number:", cleaned);
+    return cleaned;
+  };
+
+  const sendWhatsAppAlert = () => {
     const locationLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(source)}+to+${encodeURIComponent(destination)}`;
     const message = `🚨 *Safety Alert!* 🚨\n\nThere is a safety concern between:\n\n🔹 *Source:* ${source}\n🔹 *Destination:* ${destination}\n\n📍 Location: ${locationLink}\n\nPlease take necessary precautions!`;
 
-    console.log("Sending alerts to:", phoneNumbers);
-
-    if (!phoneNumbers || phoneNumbers.length === 0) {
-      alert("❌ No valid phone numbers to send alert to!");
-      return;
+    // Send message to fixed emergency number
+    const fixedEmergencyNumber = "919172951183";
+    console.log("Sending to fixed emergency number:", fixedEmergencyNumber);
+    
+    try {
+      window.open(`https://wa.me/${fixedEmergencyNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    } catch (error) {
+      console.error("Error opening WhatsApp for fixed number:", error);
     }
 
-    // Send messages with a delay between each
-    phoneNumbers.forEach((phoneNumber, index) => {
-      // Clean phone number - remove any spaces, dashes, or special characters except +
-      const cleanPhoneNumber = phoneNumber.toString().replace(/[^\d+]/g, '');
+    // Send message to user's emergency contact
+    if (emergencyMobile) {
+      const formattedEmergencyNumber = formatPhoneNumber(emergencyMobile);
       
-      console.log(`Preparing to send to: ${cleanPhoneNumber}`);
-      
-      setTimeout(() => {
-        const whatsappUrl = `https://wa.me/${cleanPhoneNumber}?text=${encodeURIComponent(message)}`;
-        console.log(`Opening WhatsApp for ${cleanPhoneNumber}:`, whatsappUrl);
-        window.open(whatsappUrl, '_blank');
-      }, index * 2000); // 2 second delay between each message
-    });
-
-    // Show confirmation message
-    const contactList = phoneNumbers.map(num => {
-      const cleanNum = num.toString().replace(/[^\d+]/g, '');
-      return `Your Emergency Contact (${cleanNum})`;
-    }).join('\n• ');
-    
-    alert(`✅ Safety alert sent to:\n• ${contactList}`);
-    onClose();
+      if (formattedEmergencyNumber && formattedEmergencyNumber.length >= 10) {
+        console.log("Sending to user's emergency contact:", formattedEmergencyNumber);
+        try {
+          window.open(`https://wa.me/${formattedEmergencyNumber}?text=${encodeURIComponent(message)}`, "_blank");
+          alert(`✅ Safety alert sent to:\n• Fixed emergency number: 9172951183\n• Your emergency contact: ${emergencyMobile}`);
+        } catch (error) {
+          console.error("Error opening WhatsApp for emergency contact:", error);
+          alert("⚠️ Safety alert sent to fixed emergency number.\nCouldn't open WhatsApp for your emergency contact.");
+        }
+      } else {
+        console.error("Invalid formatted emergency number:", formattedEmergencyNumber);
+        alert("⚠️ Safety alert sent to fixed emergency number.\nYour emergency contact number format is invalid.");
+      }
+    } else {
+      console.log("No emergency mobile number available");
+      alert("⚠️ Safety alert sent to fixed emergency number.\nPlease add an emergency contact number in your profile for additional alerts.");
+    }
   };
 
   return (
@@ -157,28 +163,12 @@ const IssueHandler = ({ source, destination, onClose }) => {
             Select an issue and help us improve safety.
           </p>
 
-          {/* Enhanced Testing Info - Show emergency contact status with loading states */}
-          <div className="mb-4 p-3 bg-white bg-opacity-20 rounded-lg">
-            <p className="text-sm text-center">
-              🧪 <strong>Testing Mode</strong>
-            </p>
-            <p className="text-xs text-center text-gray-200 mt-1">
-              {loading ? (
-                "🔄 Loading emergency contact..."
-              ) : error ? (
-                `❌ Error: ${error}`
-              ) : emergencyMobile ? (
-                `✅ Emergency Contact: ${emergencyMobile}`
-              ) : (
-                "❌ No Emergency Contact Found"
-              )}
-            </p>
-            {!loading && (
-              <p className="text-xs text-center text-gray-300 mt-1">
-                UniqueId: {localStorage.getItem("uniqueId") || "Not found"}
-              </p>
-            )}
-          </div>
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="text-center mb-4">
+              <p className="text-yellow-200">⏳ Loading emergency contact...</p>
+            </div>
+          )}
 
           <div className="relative">
             <select
@@ -200,9 +190,9 @@ const IssueHandler = ({ source, destination, onClose }) => {
           <button 
             onClick={handleSubmit} 
             className="custom-submit-btn"
-            disabled={loading}
+            disabled={isLoading && selectedIssue === "Alert Safety"}
           >
-            {loading ? "Loading..." : "Report Issue"}
+            {isLoading && selectedIssue === "Alert Safety" ? "Loading..." : "Report Issue"}
           </button>
         </motion.div>
       </div>

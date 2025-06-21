@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -72,6 +73,21 @@ const SignIn = () => {
       if (response.ok) {
         // Store session before navigation
         storeSession(data, rememberMe);
+
+        // Fetch profile data including image immediately after successful login
+        try {
+          const profileResponse = await axios.get(`http://localhost:5000/api/users/profile/${data.uniqueId}`);
+          if (profileResponse.data.profileImage) {
+            localStorage.setItem('userProfileImage', profileResponse.data.profileImage); // Store image URL
+          } else {
+            localStorage.removeItem('userProfileImage'); // Clear if no image
+          }
+        } catch (profileError) {
+          console.error('Error fetching profile image:', profileError);
+          // Even if profile image fetch fails, proceed with navigation
+          localStorage.removeItem('userProfileImage'); // Ensure no stale image
+        }
+
         navigate(`/dashboard/${data.uniqueId}`);
       } else {
         alert(data.message || 'Sign-in failed');

@@ -5,6 +5,7 @@
   justify-content: center;
   min-height: 100vh;
   padding: 30px 15px;
+  padding-top: 80px; /* Added to account for fixed navbar height */
   background: linear-gradient(135deg, #f8f9fa, #e0f7fa);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
