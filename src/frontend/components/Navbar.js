@@ -6,8 +6,26 @@ const Navbar = ({ hideMenuItems = [] }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileImageURL, setProfileImageURL] = useState("");
   const [showDefaultProfileIcon, setShowDefaultProfileIcon] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
   const { uniqueId } = useParams();
+
+  // Load theme preference from localStorage on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    if (savedTheme) {
+      setDarkMode(savedTheme === "dark");
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    } else if (prefersDark) {
+      setDarkMode(true);
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      setDarkMode(false);
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  }, []);
 
   // Load profile image from localStorage on component mount
   useEffect(() => {
@@ -46,6 +64,17 @@ const Navbar = ({ hideMenuItems = [] }) => {
     else alert("User ID not found!");
   };
 
+  const handleThemeToggle = () => {
+    const newTheme = !darkMode;
+    setDarkMode(newTheme);
+    const themeValue = newTheme ? "dark" : "light";
+    localStorage.setItem("theme", themeValue);
+    document.documentElement.setAttribute("data-theme", themeValue);
+    
+    // Dispatch custom event for other components to listen to theme changes
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: themeValue } }));
+  };
+
   const getProfileImageURL = () => {
     if (profileImageURL) {
       if (profileImageURL.startsWith('http')) {
@@ -70,7 +99,7 @@ const Navbar = ({ hideMenuItems = [] }) => {
         <img src={require("./assets/travelsafe_logo.png")} alt="TravelSafe Logo" className="logo-image" />
       </div>
 
-      {/* Moved outside navbar-menu for persistent visibility */}
+      {/* Home icon - moved outside navbar-menu for persistent visibility */}
       <a href={`/dashboard/${uniqueId}`} className="navbar-home-icon">
         <img src={require("./assets/home_icon.png")} alt="Home" className="home-icon" />
         Home
@@ -81,6 +110,24 @@ const Navbar = ({ hideMenuItems = [] }) => {
           <a key={label} href={href}>{label}</a>
         ))}
       </div>
+
+      {/* Theme toggle button */}
+      <button onClick={handleThemeToggle} className="theme-toggle-btn" title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+        <div className="theme-toggle-icon">
+          {darkMode ? (
+            // Sun icon for light mode
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          ) : (
+            // Moon icon for dark mode
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
+            </svg>
+          )}
+        </div>
+      </button>
 
       <button onClick={handleProfileClick} className="navbar-profile-icon">
         {profileImageURL && !showDefaultProfileIcon ? (

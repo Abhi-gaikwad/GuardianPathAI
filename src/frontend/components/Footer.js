@@ -1,40 +1,206 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Footer.css';
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa'; // Import icons from react-icons
+import { 
+  FaFacebookF, 
+  FaTwitter, 
+  FaInstagram, 
+  FaLinkedinIn, 
+  FaEnvelope, 
+  FaPhone, 
+  FaMapMarkerAlt,
+  FaArrowUp,
+  FaYoutube,
+  FaTelegram
+} from 'react-icons/fa';
 import icon from './assets/travelsafe_logo.png';
 
 const Footer = () => {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [email, setEmail] = useState('');
+
+  // Handle scroll to top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Handle newsletter subscription
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (email) {
+      // Here you would typically send the email to your backend
+      console.log('Newsletter subscription:', email);
+      alert('Thank you for subscribing to our newsletter!');
+      setEmail('');
+    }
+  };
+
+  // Animation observer for footer elements
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('footer-animate');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const footerElements = document.querySelectorAll('.footer-content > div');
+    footerElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="footer-section">
-      <div className="footer-content">
-        <div className="footer-logo">
-          {/* Use an <img> tag to display the logo */}
-          <img src={icon} alt="TravelSafe Logo" className="footer-logo-image" />
-          <p>Creating safest travel experiences.</p>
+    <footer className="footer-section" id="footer">
+      <div className="footer-container">
+        <div className="footer-content">
+          {/* Company Information */}
+          <div className="footer-company">
+            <div className="footer-logo-container">
+              <img src={icon} alt="TravelSafe Logo" className="footer-logo-image" />
+              <h3 className="footer-brand-name">TravelSafe</h3>
+            </div>
+            
+            <p className="footer-description">
+              Revolutionizing travel safety with cutting-edge AI technology. 
+              We're committed to making every journey safer, smarter, and more efficient 
+              for travelers worldwide.
+            </p>
+            
+            <div className="footer-features">
+              <div className="footer-feature">AI-Powered Route Optimization</div>
+              <div className="footer-feature">Real-time Safety Analytics</div>
+              <div className="footer-feature">24/7 Travel Assistance</div>
+              <div className="footer-feature">Global Coverage Network</div>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#welcome">Home</a></li>
+              <li><a href="#about">About Us</a></li>
+              <li><a href="#maproutes">Route Planning</a></li>
+              <li><a href="#safetyinsights">Safety Insights</a></li>
+              <li><a href="/help">Help Center</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/terms">Terms of Service</a></li>
+            </ul>
+          </div>
+
+          {/* Contact Information */}
+          <div className="footer-contact">
+            <h4>Contact Us</h4>
+            <div className="contact-item">
+              <FaEnvelope className="contact-icon" />
+              <a href="mailto:travelsafe@gmail.com">travelsafe@gmail.com</a>
+            </div>
+            <div className="contact-item">
+              <FaPhone className="contact-icon" />
+              <a href="tel:+919853249090">+91 985 324 90 90</a>
+            </div>
+            <div className="contact-item">
+              <FaMapMarkerAlt className="contact-icon" />
+              <span>Mumbai, Maharashtra, India</span>
+            </div>
+          </div>
+
+          {/* Social Media */}
+          <div className="footer-social-section">
+            <h4>Follow Us</h4>
+            <div className="footer-social">
+              <a href="https://facebook.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaFacebookF className="social-icon" />
+                <span>Facebook</span>
+              </a>
+              <a href="https://twitter.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaTwitter className="social-icon" />
+                <span>Twitter</span>
+              </a>
+              <a href="https://instagram.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaInstagram className="social-icon" />
+                <span>Instagram</span>
+              </a>
+              <a href="https://linkedin.com/company/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaLinkedinIn className="social-icon" />
+                <span>LinkedIn</span>
+              </a>
+              <a href="https://youtube.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaYoutube className="social-icon" />
+                <span>YouTube</span>
+              </a>
+              <a href="https://t.me/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaTelegram className="social-icon" />
+                <span>Telegram</span>
+              </a>
+            </div>
+          </div>
         </div>
-        <div className="footer-contact">
-          <h4>Contact Us</h4>
-          <p>Email: travelsafe@gmail.com</p>
-          <p>Phone: +91 985 324 90</p>
+
+        {/* Newsletter Subscription */}
+        <div className="footer-newsletter">
+          <h3 className="newsletter-title">Stay Updated</h3>
+          <p className="newsletter-description">
+            Get the latest updates on new features, safety tips, and travel insights delivered to your inbox.
+          </p>
+          <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+            <input
+              type="email"
+              className="newsletter-input"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button type="submit" className="newsletter-button">
+              Subscribe
+            </button>
+          </form>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className="footer-bottom">
+          <div className="footer-bottom-content">
+            <p className="copyright-text">
+              &copy; {currentYear} TravelSafe. All Rights Reserved.
+            </p>
+            <div className="footer-bottom-links">
+              <a href="/privacy">Privacy Policy</a>
+              <a href="/terms">Terms of Service</a>
+              <a href="/cookies">Cookie Policy</a>
+              <a href="/sitemap">Sitemap</a>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="footer-social">
-        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-          <FaFacebookF />
-        </a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-          <FaTwitter />
-        </a>
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-          <FaInstagram />
-        </a>
-        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-          <FaLinkedinIn />
-        </a>
-      </div>
-      <div className="footer-bottom">
-        <p>&copy; 2025 TravelSafe .  All Rights Reserved.</p>
-      </div>
+
+      {/* Scroll to Top Button */}
+      <button
+        className={`scroll-to-top ${showScrollTop ? 'visible' : ''}`}
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+      >
+        <FaArrowUp />
+      </button>
     </footer>
   );
 };

@@ -1,50 +1,72 @@
 .welcome-section {
-  position: relative; /* Ensure the pseudo-element is positioned relative to this element */
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: url(./assets/travel_background.jpg) no-repeat center center; /* Adjust the path if needed */
-  background-size: cover; /* Ensure the image covers the entire section */
+  background: url(./assets/travel_background.jpg) no-repeat center center;
+  background-size: cover;
   text-align: center;
-  color: #fff;
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.welcome-section::before {
+/* Light Mode Styles */
+.welcome-section.light-mode {
+  color: #fff;
+}
+
+.welcome-section.light-mode::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6); /* Overlay with specified color and opacity */
-  z-index: 1; /* Ensure the overlay is above the background but below the content */
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+/* Dark Mode Styles */
+.welcome-section.dark-mode {
+  color: #e2e8f0;
+}
+
+.welcome-section.dark-mode::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1;
 }
 
 .welcome-section > * {
   position: relative;
-  z-index: 2; /* Ensure the content is above the overlay */
+  z-index: 2;
 }
+
 .welcome-header {
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.7); /* Darkened header background for better contrast */
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 50px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Slightly darker shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   z-index: 999;
 }
 
 .logo {
-  font-size: 2.5rem; /* Slightly larger logo */
-  font-weight: 800; /* More prominent weight */
+  font-size: 2.5rem;
+  font-weight: 800;
   color: #f9f9f9;
   letter-spacing: 1.5px;
 }
@@ -52,7 +74,7 @@
 .nav ul {
   list-style-type: none;
   display: flex;
-  gap: 40px; /* Increased gap between items */
+  gap: 40px;
 }
 
 .nav ul li a {
@@ -65,9 +87,9 @@
 }
 
 .nav ul li a:hover {
-  color: #3a80fc; /* Brighter hover color */
-  background-color: rgba(255, 255, 255, 0.2); /* Subtle hover background */
-  border-radius: 10px; /* Rounded hover effect */
+  color: #3a80fc;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .menu-toggle {
@@ -79,40 +101,61 @@
 .welcome-content {
   text-align: center;
   padding: 0 20px;
-  display: flex; /* Add this */
-  flex-direction: column; /* Add this */
-  align-items: center; /* Add this */
-  justify-content: center; /* Add this */
-  height: 100%; /* Add this to ensure it takes full height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .welcome-content h1 {
-  font-size: 3.5rem; /* Larger font size */
+  font-size: 3.5rem;
   margin-bottom: 20px;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 900;
   animation: fadeInUp 1.5s ease forwards;
+  transition: color 0.3s ease;
+}
+
+/* Light mode heading */
+.light-mode .welcome-content h1 {
+  color: #fff;
+}
+
+/* Dark mode heading */
+.dark-mode .welcome-content h1 {
+  color: #f1f5f9;
 }
 
 .welcome-content p {
   font-size: 1.4rem;
-  color: #ddd;
   margin-bottom: 40px;
   animation: fadeInUp 1.8s ease forwards;
-  max-width: 600px; /* Restrict width for better readability */
-  line-height: 1.6; /* Improved line spacing */
+  max-width: 600px;
+  line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+/* Light mode paragraph */
+.light-mode .welcome-content p {
+  color: #ddd;
+}
+
+/* Dark mode paragraph */
+.dark-mode .welcome-content p {
+  color: #cbd5e1;
 }
 
 .location-inputs {
   margin: 20px 0;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centering input fields */
+  align-items: center;
   gap: 15px;
   animation: fadeInUp 2s ease forwards;
 }
+
 .location-inputs input {
   padding: 15px;
   width: 400px;
@@ -120,27 +163,50 @@
   border: none;
   border-radius: 30px;
   font-size: 1rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  background: rgb(234, 221, 221); /* Changed to solid white background */
-  color: #000; /* Changed text color to black */
-  border: black;
 }
 
-.location-inputs input::placeholder {
+/* Light mode inputs */
+.light-mode .location-inputs input {
+  background: rgb(234, 221, 221);
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.light-mode .location-inputs input::placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
 
-.location-inputs input:focus {
-  background: rgba(255, 255, 255, 1); /* Ensure background remains white on focus */
+.light-mode .location-inputs input:focus {
+  background: rgba(255, 255, 255, 1);
   color: #000;
   outline: none;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4); /* Deeper focus effect */
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark mode inputs */
+.dark-mode .location-inputs input {
+  background: rgba(51, 65, 85, 0.9);
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+.dark-mode .location-inputs input::placeholder {
+  color: rgba(203, 213, 225, 0.7);
+}
+
+.dark-mode .location-inputs input:focus {
+  background: rgba(30, 41, 59, 0.95);
+  color: #f1f5f9;
+  outline: none;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+  border-color: #64748b;
 }
 
 .start-btn {
   padding: 15px 50px;
-  background: linear-gradient(135deg, #4faaf7, #f24b21); /* Updated gradient for the button */
+  background: linear-gradient(135deg, #4faaf7, #f24b21);
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -152,36 +218,74 @@
 
 .start-btn:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
-  background: linear-gradient(135deg, #f1bc6c, #29d4ee); /* Button hover gradient */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #f1bc6c, #29d4ee);
 }
 
-/* 🚀 Show Route Button */
+/* Show Route Button */
 .show-route-btn {
   padding: 15px 50px;
-  background-color: #007BFF; /* Solid blue color */
-  color: #fff;
   border: none;
-  border-radius: 50px; /* Ensures rounded corners */
+  border-radius: 50px;
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 20px; /* Add margin to separate from other elements */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  margin-top: 20px;
+}
+
+/* Light mode button */
+.light-mode .show-route-btn {
+  background-color: #007BFF;
+  color: #fff;
+}
+
+.light-mode .show-route-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #f1bc6c, #29d4ee);
+}
+
+/* Dark mode button */
+.dark-mode .show-route-btn {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: #f8fafc;
+}
+
+.dark-mode .show-route-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
 }
 
 .buttons-container {
-  display: flex;  /* Use flexbox layout */
-  justify-content: center;  /* Center the buttons horizontally */
-  gap: 20px;  /* Add space between the buttons */
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
+/* Error message styling */
+.error-message {
+  color: #ef4444;
+  font-size: 1rem;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
 
+/* Light mode error message */
+.light-mode .error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
 
-.show-route-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); /* Stronger hover shadow */
-  background: linear-gradient(135deg, #f1bc6c, #29d4ee); /* Button hover gradient */
+/* Dark mode error message */
+.dark-mode .error-message {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fca5a5;
 }
 
 /* Animation */
@@ -204,5 +308,15 @@
 
   .location-inputs input {
     width: 90%;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .show-route-btn {
+    width: 80%;
+    margin-top: 10px;
   }
 }

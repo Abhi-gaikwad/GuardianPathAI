@@ -7,6 +7,32 @@ const Welcome = ({ setSource, setDestination, handleUserChoice }) => {
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Load theme preference and listen for theme changes
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    if (savedTheme) {
+      setDarkMode(savedTheme === "dark");
+    } else if (prefersDark) {
+      setDarkMode(true);
+    } else {
+      setDarkMode(false);
+    }
+
+    // Listen for theme changes from navbar
+    const handleThemeChange = (event) => {
+      setDarkMode(event.detail.theme === 'dark');
+    };
+
+    window.addEventListener('themeChanged', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
+  }, []);
 
   // If not logged in and not loading, the useSession hook will handle the redirect.
   // We only need to render the component if the user is logged in or if we are still loading.
@@ -43,7 +69,7 @@ const Welcome = ({ setSource, setDestination, handleUserChoice }) => {
   };
 
   return (
-    <section className="welcome-section">
+    <section className={`welcome-section ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       <div className="welcome-content">
         <h1>Welcome to TravelSafe</h1>
         <p>Your guide to safer travels and smart route planning.</p>
@@ -65,7 +91,7 @@ const Welcome = ({ setSource, setDestination, handleUserChoice }) => {
 
         {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-        <div className="buttons-container" >
+        <div className="buttons-container">
           <button className="show-route-btn" onClick={() => handleClick('showRoutes')}>
             Show Routes
           </button>
