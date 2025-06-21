@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./FeedbackForm.css";
 
-const FeedbackForm = ({ onFeedbackSubmit }) => {
+const FeedbackForm = ({ onFeedbackSubmit }) => { // Changed prop name to be consistent with usage
   const [formData, setFormData] = useState({
     source: "",
     destination: "",
@@ -22,8 +22,8 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "number" ? Number(value) : 
-             type === "checkbox" ? e.target.checked : 
+      [name]: type === "number" ? Number(value) :
+             type === "checkbox" ? e.target.checked :
              value
     }));
   };
@@ -33,9 +33,12 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:5000/api/feedbacks", formData);
+      // Removed the axios.post call from here.
+      // Now, we pass the formData up to the parent component (MapRoutes)
+      // for centralized handling of the API call and alerts.
+      await onFeedbackSubmit(formData); // Pass formData to the parent handler
 
-      alert(response.data.message);
+      // Reset the form only after the parent's submission is successful
       setFormData({
         source: "",
         destination: "",
@@ -48,11 +51,10 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
         crimeRate: 0,
         review: "",
       });
-
-      onFeedbackSubmit();
     } catch (error) {
-      console.error("❌ Failed to submit feedback:", error.response?.data || error.message);
-      // alert("Failed to submit feedback. Please try again.");
+      // The parent component (MapRoutes) will handle the alert for submission errors.
+      // You can log errors here for debugging if needed.
+      console.error("❌ Error in FeedbackForm handleSubmit:", error);
     } finally {
       setLoading(false);
     }
@@ -83,27 +85,27 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
 
       <label>
         Traffic Density (0-100):
-        <input 
-          type="number" 
-          name="trafficDensity" 
-          min="0" 
-          max="100" 
-          value={formData.trafficDensity} 
-          onChange={handleChange} 
-          required 
+        <input
+          type="number"
+          name="trafficDensity"
+          min="0"
+          max="100"
+          value={formData.trafficDensity}
+          onChange={handleChange}
+          required
         />
       </label>
 
       <label>
         Road Quality (1-5):
-        <input 
-          type="number" 
-          name="roadQuality" 
-          min="1" 
-          max="5" 
-          value={formData.roadQuality} 
-          onChange={handleChange} 
-          required 
+        <input
+          type="number"
+          name="roadQuality"
+          min="1"
+          max="5"
+          value={formData.roadQuality}
+          onChange={handleChange}
+          required
         />
       </label>
 
@@ -119,38 +121,38 @@ const FeedbackForm = ({ onFeedbackSubmit }) => {
 
       <label>
         Accident Occurred:
-        <input 
-          type="checkbox" 
-          name="accidentOccurred" 
-          checked={formData.accidentOccurred} 
-          onChange={handleChange} 
+        <input
+          type="checkbox"
+          name="accidentOccurred"
+          checked={formData.accidentOccurred}
+          onChange={handleChange}
         />
       </label>
 
       {formData.accidentOccurred && (
         <label>
           Accident Count:
-          <input 
-            type="number" 
-            name="accidentCount" 
-            min="0" 
-            value={formData.accidentCount} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="number"
+            name="accidentCount"
+            min="0"
+            value={formData.accidentCount}
+            onChange={handleChange}
+            required
           />
         </label>
       )}
 
       <label>
         Crime Rate (0-100):
-        <input 
-          type="number" 
-          name="crimeRate" 
-          min="0" 
-          max="100" 
-          value={formData.crimeRate} 
-          onChange={handleChange} 
-          required 
+        <input
+          type="number"
+          name="crimeRate"
+          min="0"
+          max="100"
+          value={formData.crimeRate}
+          onChange={handleChange}
+          required
         />
       </label>
 

@@ -304,22 +304,20 @@ const MapRoutes = ({ source, destination, userChoice }) => {
 
   useEffect(() => {
     if (!source || !destination) return;
-    
+
     const initializeRoute = async () => {
       if (userChoice === "showRoutes") {
         await fetchRoutes(true);
-        // Don't set journeyStarted here - we just want to show routes
       } else if (userChoice === "startJourney") {
         await fetchRoutes(false);
-        handleStartJourney(); // This will set journeyStarted to true
+        handleStartJourney();
       }
     };
-    
+
     initializeRoute();
   }, [source, destination, userChoice]);
 
   useEffect(() => {
-    // Only fetch feedback if both source and destination are provided
     if (source && destination) {
       fetchFeedback();
     } else {
@@ -361,11 +359,11 @@ const MapRoutes = ({ source, destination, userChoice }) => {
           coordinates: [srcCoords.reverse(), destCoords.reverse()],
           alternative_routes: { target_count: 3, weight_factor: 1.3 },
         },
-        { 
-          headers: { 
-            Authorization: API_KEY, 
-            "Content-Type": "application/json" 
-          } 
+        {
+          headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json"
+          }
         }
       );
 
@@ -408,7 +406,7 @@ const MapRoutes = ({ source, destination, userChoice }) => {
     try {
       setLoadingFeedback(true);
       setFeedbackError("");
-      
+
       if (!source || !destination) {
         setFeedbackList([]);
         setHasFeedback(false);
@@ -416,12 +414,12 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       }
 
       const response = await axios.get("http://localhost:5000/api/feedbacks", {
-        params: { 
+        params: {
           source: source.trim(),
           destination: destination.trim()
         }
       });
-      
+
       setFeedbackList(response.data);
       setHasFeedback(response.data.length > 0);
     } catch (err) {
@@ -433,10 +431,6 @@ const MapRoutes = ({ source, destination, userChoice }) => {
     }
   };
 
-  // Call this whenever source or destination changes
-  useEffect(() => {
-    fetchFeedback();
-  }, [source, destination]);
   const markerIcon = (iconUrl) =>
     new L.Icon({
       iconUrl,
@@ -456,43 +450,44 @@ const MapRoutes = ({ source, destination, userChoice }) => {
     setJourneyStarted(false);
   };
 
+  // This function now receives the formData from FeedbackForm.js
   const handleFeedbackSubmit = async (feedbackData) => {
     try {
-      console.log("📤 Submitting feedback:", feedbackData);
-      
-      // Submit feedback to the correct endpoint
-      const response = await axios.post("http://localhost:5000/api/feedbacks", {
+      console.log("📤 Submitting feedback from MapRoutes:", feedbackData);
+
+      // Add source and destination to the feedbackData if not already present,
+      // as FeedbackForm might not have them if initialized without.
+      const dataToSubmit = {
         ...feedbackData,
-        source,
-        destination
-      });
-      
+        source: feedbackData.source || source,
+        destination: feedbackData.destination || destination
+      };
+
+      const response = await axios.post("http://localhost:5000/api/feedbacks", dataToSubmit);
+
       console.log("✅ Feedback submitted successfully:", response.data);
-      
-      // Reset states immediately after successful submission
+
       setJourneyCompleted(false);
-      setFeedbackError(""); // Clear any previous errors
-      
-      // Fetch feedback after successful submission
-      await fetchFeedback();
-      
+      setJourneyStarted(false);
+      setFeedbackError("");
+      alert("✅ Feedback submitted successfully!"); // Success alert here
+
+      await fetchFeedback(); // Fetch updated feedback list
     } catch (err) {
       console.error("❌ Feedback submit error:", err);
-      console.error("Error details:", err.response?.data);
-      console.error("Error status:", err.response?.status);
-      
-      // Only set error if it's actually a failed request (not a successful one)
-      if (err.response?.status >= 400) {
-        setFeedbackError(
-          err.response?.data?.error || 
-          "Failed to submit feedback. Please try again."
-        );
-      } else {
-        // If it's not actually an error (like a 201 success), clear the error
-        setFeedbackError("");
-        setJourneyCompleted(false);
-        await fetchFeedback();
+
+      let errorMessage = "Failed to submit feedback. Please try again.";
+
+      if (err.response) {
+        errorMessage = err.response.data?.message ||
+                      err.response.data?.error ||
+                      `Server error: ${err.response.status}`;
+      } else if (err.request) {
+        errorMessage = "Network error. Please check your connection.";
       }
+
+      setFeedbackError(errorMessage);
+      alert(errorMessage); // Error alert here
     }
   };
 
@@ -507,36 +502,34 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       <h2 className="map-heading">Route Planner: {source} to {destination}</h2>
 
       <div className="map-container">
-        {/* // In MapRoutes component, modify the MapContainer section: */}
-      <MapContainer 
-        center={sourceCoords || [18.5204, 73.8567]} 
-        zoom={sourceCoords ? 10 : 12} 
-        className="map"
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <MapContainer
+          center={sourceCoords || [18.5204, 73.8567]}
+          zoom={sourceCoords ? 10 : 12}
+          className="map"
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* Show routes if either journeyStarted OR user chose showRoutes */}
-        {(journeyStarted || userChoice === "showRoutes") && routes.map((route, index) => (
-          <Polyline 
-            key={index} 
-            positions={route} 
-            color={index === 0 ? "blue" : "gray"} 
-            weight={4}
-          />
-        ))}
+          {(journeyStarted || userChoice === "showRoutes") && routes.map((route, index) => (
+            <Polyline
+              key={index}
+              positions={route}
+              color={index === 0 ? "blue" : "gray"}
+              weight={4}
+            />
+          ))}
 
-        {sourceCoords && (
-          <Marker position={sourceCoords} icon={markerIcon(source_icon)}>
-            <Popup>Source: {source}</Popup>
-          </Marker>
-        )}
+          {sourceCoords && (
+            <Marker position={sourceCoords} icon={markerIcon(source_icon)}>
+              <Popup>Source: {source}</Popup>
+            </Marker>
+          )}
 
-        {destinationCoords && (
-          <Marker position={destinationCoords} icon={markerIcon(destination_icon)}>
-            <Popup>Destination: {destination}</Popup>
-          </Marker>
-        )}
-      </MapContainer>
+          {destinationCoords && (
+            <Marker position={destinationCoords} icon={markerIcon(destination_icon)}>
+              <Popup>Destination: {destination}</Popup>
+            </Marker>
+          )}
+        </MapContainer>
 
         <div className="route-details">
           <h3>Route Details</h3>
@@ -576,7 +569,7 @@ const MapRoutes = ({ source, destination, userChoice }) => {
                     {new Date(feedback.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                
+
                 <div className="feedback-metrics">
                   <div className="metric">
                     <span className="metric-label">Road Condition:</span>
@@ -584,18 +577,18 @@ const MapRoutes = ({ source, destination, userChoice }) => {
                       {feedback.roadCondition}
                     </span>
                   </div>
-                  
+
                   <div className="metric">
                     <span className="metric-label">Traffic Density:</span>
                     <span className="metric-value">{feedback.trafficDensity}%</span>
                   </div>
-                  
+
                   <div className="metric">
                     <span className="metric-label">Road Quality:</span>
                     <span className="metric-value">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <span 
-                          key={i} 
+                        <span
+                          key={i}
                           className={`star ${i < feedback.roadQuality ? 'filled' : ''}`}
                         >
                           ★
@@ -616,13 +609,13 @@ const MapRoutes = ({ source, destination, userChoice }) => {
                     </span>
                   </div>
                 </div>
-                
+
                 {feedback.accidentOccurred && (
                   <div className="accident-info">
                     <p><strong>⚠️ Accident Occurred:</strong> {feedback.accidentCount} incident(s)</p>
                   </div>
                 )}
-                
+
                 <div className="user-review">
                   <p><strong>User Review:</strong></p>
                   <p className="review-text">{feedback.review}</p>
@@ -642,8 +635,8 @@ const MapRoutes = ({ source, destination, userChoice }) => {
           <button className="complete-btn" onClick={handleCompleteJourney}>
             Complete Journey
           </button>
-          <button 
-            className="issue-btn" 
+          <button
+            className="issue-btn"
             onClick={() => setShowIssueOptions(true)}
           >
             Report Issue
@@ -652,10 +645,10 @@ const MapRoutes = ({ source, destination, userChoice }) => {
       )}
 
       {journeyCompleted && (
-        <FeedbackForm 
-          source={source} 
-          destination={destination} 
-          onSubmit={handleFeedbackSubmit} 
+        <FeedbackForm
+          source={source}
+          destination={destination}
+          onFeedbackSubmit={handleFeedbackSubmit} // Corrected prop name to match FeedbackForm's usage
         />
       )}
 

@@ -5,6 +5,7 @@ import "./navbar.css";
 const Navbar = ({ hideMenuItems = [] }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileImageURL, setProfileImageURL] = useState("");
+  const [showDefaultProfileIcon, setShowDefaultProfileIcon] = useState(false);
   const navigate = useNavigate();
   const { uniqueId } = useParams();
 
@@ -13,17 +14,23 @@ const Navbar = ({ hideMenuItems = [] }) => {
     const storedProfileImage = localStorage.getItem("userProfileImage");
     if (storedProfileImage) {
       setProfileImageURL(storedProfileImage);
+      setShowDefaultProfileIcon(false);
+    } else {
+      setShowDefaultProfileIcon(true);
     }
 
-    // Listen for storage changes to update profile image in real-time
     const handleStorageChange = () => {
       const updatedProfileImage = localStorage.getItem("userProfileImage");
-      setProfileImageURL(updatedProfileImage || "");
+      if (updatedProfileImage) {
+        setProfileImageURL(updatedProfileImage);
+        setShowDefaultProfileIcon(false);
+      } else {
+        setProfileImageURL("");
+        setShowDefaultProfileIcon(true);
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events from the same tab
     window.addEventListener('profileImageUpdated', handleStorageChange);
 
     return () => {
@@ -33,20 +40,17 @@ const Navbar = ({ hideMenuItems = [] }) => {
   }, []);
 
   const handleMenuToggle = () => setMenuOpen(!menuOpen);
-  
+
   const handleProfileClick = () => {
     if (uniqueId) navigate(`/profile/${uniqueId}`);
     else alert("User ID not found!");
   };
 
-  // Helper function to get the correct image URL
   const getProfileImageURL = () => {
     if (profileImageURL) {
-      // If it's already a full URL, return as is
       if (profileImageURL.startsWith('http')) {
         return profileImageURL;
       }
-      // If it's a relative path, prepend server URL
       return `http://localhost:5000${profileImageURL.startsWith('/') ? '' : '/'}${profileImageURL}`;
     }
     return "";
@@ -65,38 +69,38 @@ const Navbar = ({ hideMenuItems = [] }) => {
       <div className="navbar-logo">
         <img src={require("./assets/travelsafe_logo.png")} alt="TravelSafe Logo" className="logo-image" />
       </div>
+
+      {/* Moved outside navbar-menu for persistent visibility */}
+      <a href={`/dashboard/${uniqueId}`} className="navbar-home-icon">
+        <img src={require("./assets/home_icon.png")} alt="Home" className="home-icon" />
+        Home
+      </a>
+
       <div className={`navbar-menu ${menuOpen ? "open" : ""}`}>
-        <a href={`/dashboard/${uniqueId}`} className="navbar-home-icon">
-          <img src={require("./assets/home_icon.png")} alt="Home" className="home-icon" />
-          Home
-        </a>
         {menuItems.map(({ label, href }) => (
           <a key={label} href={href}>{label}</a>
         ))}
-        <button onClick={handleProfileClick} className="navbar-profile-icon">
-          {profileImageURL ? (
-            <img 
-              src={getProfileImageURL()} 
-              alt="User Profile" 
-              className="profile-icon profile-photo"
-              onError={(e) => {
-                console.error("Error loading profile image:", getProfileImageURL());
-                // Hide the uploaded image and show default icon
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'block';
-              }}
-            />
-          ) : null}
-          
-          {/* Default profile icon - shown when no image or image fails to load */}
-          <img 
-            src={require("./assets/user_profile_icon.png")} 
-            alt="User Profile" 
-            className="profile-icon profile-default"
-            style={{ display: profileImageURL ? 'none' : 'block' }}
-          />
-        </button>
       </div>
+
+      <button onClick={handleProfileClick} className="navbar-profile-icon">
+        {profileImageURL && !showDefaultProfileIcon ? (
+          <img
+            src={getProfileImageURL()}
+            alt="User Profile"
+            className="profile-icon profile-photo"
+            onError={() => setShowDefaultProfileIcon(true)}
+          />
+        ) : null}
+
+        {showDefaultProfileIcon || !profileImageURL ? (
+          <img
+            src={require("./assets/user_profile_icon.png")}
+            alt="User Profile"
+            className="profile-icon profile-default"
+          />
+        ) : null}
+      </button>
+
       <div className={`menu-toggle ${menuOpen ? "open" : ""}`} onClick={handleMenuToggle}>
         <span></span>
         <span></span>
