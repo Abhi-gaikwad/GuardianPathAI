@@ -101,9 +101,9 @@ const Footer = () => {
               <li><a href="#about">About Us</a></li>
               <li><a href="#maproutes">Route Planning</a></li>
               <li><a href="#safetyinsights">Safety Insights</a></li>
-              <li><a href="/help">Help Center</a></li>
+              {/* <li><a href="/help">Help Center</a></li>
               <li><a href="/privacy">Privacy Policy</a></li>
-              <li><a href="/terms">Terms of Service</a></li>
+              <li><a href="/terms">Terms of Service</a></li> */}
             </ul>
           </div>
 
@@ -112,15 +112,15 @@ const Footer = () => {
             <h4>Contact Us</h4>
             <div className="contact-item">
               <FaEnvelope className="contact-icon" />
-              <a href="mailto:travelsafe@gmail.com">travelsafe@gmail.com</a>
+              <a href="mailto:travelsafe@gmail.com">travelsafe2004@gmail.com</a>
             </div>
             <div className="contact-item">
               <FaPhone className="contact-icon" />
-              <a href="tel:+919853249090">+91 985 324 90 90</a>
+              <a href="tel:+919853249090">+91 9322038017</a>
             </div>
             <div className="contact-item">
               <FaMapMarkerAlt className="contact-icon" />
-              <span>Mumbai, Maharashtra, India</span>
+              <span>Pune, Maharashtra, India</span>
             </div>
           </div>
 
@@ -128,30 +128,30 @@ const Footer = () => {
           <div className="footer-social-section">
             <h4>Follow Us</h4>
             <div className="footer-social">
-              <a href="https://facebook.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaFacebookF className="social-icon" />
                 <span>Facebook</span>
               </a>
-              <a href="https://twitter.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaTwitter className="social-icon" />
                 <span>Twitter</span>
               </a>
-              <a href="https://instagram.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaInstagram className="social-icon" />
                 <span>Instagram</span>
               </a>
-              <a href="https://linkedin.com/company/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              <a href="" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaLinkedinIn className="social-icon" />
                 <span>LinkedIn</span>
               </a>
-              <a href="https://youtube.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
+              {/* <a href="https://youtube.com/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaYoutube className="social-icon" />
                 <span>YouTube</span>
               </a>
               <a href="https://t.me/travelsafe" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaTelegram className="social-icon" />
                 <span>Telegram</span>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
@@ -184,10 +184,10 @@ const Footer = () => {
               &copy; {currentYear} TravelSafe. All Rights Reserved.
             </p>
             <div className="footer-bottom-links">
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms of Service</a>
-              <a href="/cookies">Cookie Policy</a>
-              <a href="/sitemap">Sitemap</a>
+              <a href="/#">Privacy Policy</a>
+              <a href="/#">Terms of Service</a>
+              <a href="/#">Cookie Policy</a>
+              <a href="/#">Sitemap</a>
             </div>
           </div>
         </div>

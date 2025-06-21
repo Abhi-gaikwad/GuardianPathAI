@@ -9,6 +9,7 @@ const Profile = () => {
   const { uniqueId } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,6 +19,37 @@ const Profile = () => {
   });
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [previewImageURL, setPreviewImageURL] = useState("");
+
+  // Initialize theme on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    if (savedTheme) {
+      const isDark = savedTheme === "dark";
+      setDarkMode(isDark);
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    } else if (prefersDark) {
+      setDarkMode(true);
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      setDarkMode(false);
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    // Listen for theme changes from navbar
+    const handleThemeChange = (event) => {
+      const newTheme = event.detail.theme;
+      setDarkMode(newTheme === "dark");
+      document.documentElement.setAttribute("data-theme", newTheme);
+    };
+
+    window.addEventListener('themeChanged', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
+  }, []);
 
   // Check session validity on component mount
   useEffect(() => {
@@ -95,6 +127,8 @@ const Profile = () => {
         setPreviewImageURL(response.data.profileImage);
         // Store the profile image URL in localStorage for navbar access
         localStorage.setItem("userProfileImage", response.data.profileImage);
+        // Dispatch custom event to notify navbar of profile image update
+        window.dispatchEvent(new CustomEvent('profileImageUpdated'));
       } else if (selectedImageFile && !response.data.profileImage) {
         // If image was uploaded but server didn't return URL, keep the preview
         // This handles cases where server processes image but doesn't return URL immediately
@@ -116,6 +150,8 @@ const Profile = () => {
             setPreviewImageURL(refreshResponse.data.profileImage);
             // Update localStorage with the latest profile image
             localStorage.setItem("userProfileImage", refreshResponse.data.profileImage);
+            // Dispatch custom event to notify navbar of profile image update
+            window.dispatchEvent(new CustomEvent('profileImageUpdated'));
           }
         } catch (error) {
           console.error("Error refreshing profile data:", error);
@@ -172,11 +208,13 @@ const Profile = () => {
   useEffect(() => {
     if (formData.profileImage) {
       localStorage.setItem("userProfileImage", formData.profileImage);
+      // Dispatch custom event to notify navbar of profile image update
+      window.dispatchEvent(new CustomEvent('profileImageUpdated'));
     }
   }, [formData.profileImage]);
 
   return (
-    <div className="profile-container">
+    <div className={`profile-container ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       <Navbar hideMenuItems={["Welcome", "Map Routes", "Safety Insights", "About", "Footer"]} />
 
       <div className="profile-card">

@@ -1,3 +1,4 @@
+/* Light Mode Styles (Default) */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -8,6 +9,7 @@
   padding-top: 80px; /* Added to account for fixed navbar height */
   background: linear-gradient(135deg, #f8f9fa, #e0f7fa);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background 0.3s ease;
 }
 
 .profile-card {
@@ -18,12 +20,14 @@
   width: 100%;
   max-width: 340px;
   text-align: center;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .profile-card h2 {
   font-size: 22px;
   margin-bottom: 16px;
   color: #333;
+  transition: color 0.3s ease;
 }
 
 /* Profile Image */
@@ -41,6 +45,7 @@
   object-fit: cover;
   border: 3px solid #00bcd4;
   box-shadow: 0 3px 8px rgba(0, 188, 212, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .image-placeholder {
@@ -52,6 +57,8 @@
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  color: #666;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .image-upload-label {
@@ -80,6 +87,7 @@
   margin-top: 8px;
   font-size: 14px;
   color: #444;
+  transition: color 0.3s ease;
 }
 
 .profile-card input {
@@ -89,7 +97,8 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #fdfdfd;
-  transition: border 0.2s ease;
+  color: #333;
+  transition: border 0.2s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .profile-card input:focus {
@@ -100,6 +109,7 @@
 .profile-card input:disabled {
   background-color: #f0f0f0;
   color: #888;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Buttons */
@@ -127,9 +137,98 @@
 .logout-btn:hover {
   background-color: #c82333;
 }
+
+/* Dark Mode Styles using data-theme attribute */
+[data-theme="dark"] .profile-container {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+[data-theme="dark"] .profile-card {
+  background: #2d3748;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: 1px solid #4a5568;
+}
+
+[data-theme="dark"] .profile-card h2 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .profile-card label {
+  color: #cbd5e0;
+}
+
+[data-theme="dark"] .profile-card input {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .profile-card input:focus {
+  border-color: #00bcd4;
+  background-color: #4a5568;
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+}
+
+[data-theme="dark"] .profile-card input:disabled {
+  background-color: #2d3748;
+  color: #a0aec0;
+  border-color: #4a5568;
+}
+
+[data-theme="dark"] .image-placeholder {
+  background: #4a5568;
+  color: #a0aec0;
+  border: 2px dashed #718096;
+}
+
+[data-theme="dark"] .profile-image-preview {
+  border-color: #00bcd4;
+  box-shadow: 0 3px 8px rgba(0, 188, 212, 0.4);
+}
+
+[data-theme="dark"] .image-upload-label {
+  background: #00bcd4;
+  color: #fff;
+}
+
+[data-theme="dark"] .image-upload-label:hover {
+  background: #0197a4;
+}
+
+[data-theme="dark"] .profile-card button {
+  background-color: #4299e1;
+  color: #fff;
+}
+
+[data-theme="dark"] .profile-card button:hover {
+  background-color: #3182ce;
+}
+
+[data-theme="dark"] .logout-btn {
+  background-color: #e53e3e;
+}
+
+[data-theme="dark"] .logout-btn:hover {
+  background-color: #c53030;
+}
+
+/* Additional dark mode enhancements */
+[data-theme="dark"] .profile-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  z-index: -1;
+}
+
+/* Responsive Design */
 @media screen and (max-width: 768px) {
   .profile-card {
     max-width: 400px;
+    padding: 18px 16px;
   }
 
   .profile-card h2 {
@@ -141,4 +240,29 @@
     width: 90px;
     height: 90px;
   }
+
+  .profile-container {
+    padding: 20px 15px;
+    padding-top: 70px;
+  }
+}
+
+/* Smooth theme transition for all elements */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Focus states for better accessibility */
+[data-theme="dark"] .profile-card button:focus,
+[data-theme="dark"] .profile-card input:focus,
+[data-theme="dark"] .image-upload-label:focus {
+  outline: 2px solid #00bcd4;
+  outline-offset: 2px;
+}
+
+.profile-card button:focus,
+.profile-card input:focus,
+.image-upload-label:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
 }
