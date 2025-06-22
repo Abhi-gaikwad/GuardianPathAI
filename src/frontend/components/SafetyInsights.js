@@ -82,6 +82,37 @@ const SafetyInsights = () => {
         }
     }, [selectedState, selectedCity, dataType, accidentData, crimeData]);
 
+    // Function to get top important crime data
+    const getImportantCrimeData = (data) => {
+        if (!data || data.length === 0) return [];
+        
+        // Group crimes by description and count occurrences
+        const crimeCount = {};
+        data.forEach(entry => {
+            const crimeDesc = entry["Crime Description"];
+            if (crimeDesc) {
+                crimeCount[crimeDesc] = (crimeCount[crimeDesc] || 0) + 1;
+            }
+        });
+        
+        // Convert to array and sort by count (descending)
+        const sortedCrimes = Object.entries(crimeCount)
+            .map(([description, count]) => ({
+                "Crime Description": description,
+                "Crime Count": count
+            }))
+            .sort((a, b) => b["Crime Count"] - a["Crime Count"])
+            .slice(0, 10);
+        
+        return sortedCrimes;
+    };
+
+    // Function to truncate long crime descriptions
+    const truncateLabel = (label, maxLength = 25) => {
+        if (!label) return 'Unknown Crime';
+        return label.length > maxLength ? label.substring(0, maxLength) + '...' : label;
+    };
+
     // Dynamic chart styling based on theme
     const getChartOptions = () => {
         const textColor = darkMode ? '#f1f5f9' : '#1f2937';
@@ -105,7 +136,15 @@ const SafetyInsights = () => {
                     titleColor: textColor,
                     bodyColor: textColor,
                     borderColor: darkMode ? '#4b5563' : '#d1d5db',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    callbacks: {
+                        title: function(context) {
+                            // Show full crime description in tooltip
+                            const dataIndex = context[0].dataIndex;
+                            const importantData = getImportantCrimeData(filteredData);
+                            return importantData[dataIndex]?.["Crime Description"] || 'Unknown Crime';
+                        }
+                    }
                 }
             },
             scales: {
@@ -113,8 +152,10 @@ const SafetyInsights = () => {
                     ticks: {
                         color: textColor,
                         font: {
-                            size: 11
-                        }
+                            size: 10
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
                     },
                     grid: {
                         color: gridColor
@@ -129,6 +170,15 @@ const SafetyInsights = () => {
                     },
                     grid: {
                         color: gridColor
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Crime Incidents',
+                        color: textColor,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
                     }
                 }
             }
@@ -210,14 +260,37 @@ const SafetyInsights = () => {
         ]
     };
 
+    // Improved crime chart data - showing only top 10 important crimes
     const crimeChartData = {
-        labels: filteredData.map(entry => entry["Crime Description"]),
+        labels: getImportantCrimeData(filteredData).map(entry => truncateLabel(entry["Crime Description"])),
         datasets: [
             {
                 label: 'Crime Count',
-                data: filteredData.map(entry => entry["Police Deployed"]),
-                backgroundColor: darkMode ? 'rgba(34, 197, 94, 0.6)' : 'rgba(54, 162, 235, 0.6)',
-                borderColor: darkMode ? 'rgba(34, 197, 94, 1)' : 'rgba(54, 162, 235, 1)',
+                data: getImportantCrimeData(filteredData).map(entry => entry["Crime Count"]),
+                backgroundColor: [
+                    darkMode ? 'rgba(239, 68, 68, 0.6)' : 'rgba(239, 68, 68, 0.6)',   // Red
+                    darkMode ? 'rgba(245, 158, 11, 0.6)' : 'rgba(245, 158, 11, 0.6)', // Amber
+                    darkMode ? 'rgba(34, 197, 94, 0.6)' : 'rgba(34, 197, 94, 0.6)',   // Green
+                    darkMode ? 'rgba(59, 130, 246, 0.6)' : 'rgba(59, 130, 246, 0.6)', // Blue
+                    darkMode ? 'rgba(147, 51, 234, 0.6)' : 'rgba(147, 51, 234, 0.6)', // Purple
+                    darkMode ? 'rgba(236, 72, 153, 0.6)' : 'rgba(236, 72, 153, 0.6)', // Pink
+                    darkMode ? 'rgba(20, 184, 166, 0.6)' : 'rgba(20, 184, 166, 0.6)', // Teal
+                    darkMode ? 'rgba(251, 146, 60, 0.6)' : 'rgba(251, 146, 60, 0.6)', // Orange
+                    darkMode ? 'rgba(168, 85, 247, 0.6)' : 'rgba(168, 85, 247, 0.6)', // Violet
+                    darkMode ? 'rgba(14, 165, 233, 0.6)' : 'rgba(14, 165, 233, 0.6)'  // Sky
+                ],
+                borderColor: [
+                    darkMode ? 'rgba(239, 68, 68, 1)' : 'rgba(239, 68, 68, 1)',
+                    darkMode ? 'rgba(245, 158, 11, 1)' : 'rgba(245, 158, 11, 1)',
+                    darkMode ? 'rgba(34, 197, 94, 1)' : 'rgba(34, 197, 94, 1)',
+                    darkMode ? 'rgba(59, 130, 246, 1)' : 'rgba(59, 130, 246, 1)',
+                    darkMode ? 'rgba(147, 51, 234, 1)' : 'rgba(147, 51, 234, 1)',
+                    darkMode ? 'rgba(236, 72, 153, 1)' : 'rgba(236, 72, 153, 1)',
+                    darkMode ? 'rgba(20, 184, 166, 1)' : 'rgba(20, 184, 166, 1)',
+                    darkMode ? 'rgba(251, 146, 60, 1)' : 'rgba(251, 146, 60, 1)',
+                    darkMode ? 'rgba(168, 85, 247, 1)' : 'rgba(168, 85, 247, 1)',
+                    darkMode ? 'rgba(14, 165, 233, 1)' : 'rgba(14, 165, 233, 1)'
+                ],
                 borderWidth: 2,
                 borderRadius: 4,
                 borderSkipped: false,
@@ -272,6 +345,12 @@ const SafetyInsights = () => {
                 </aside>
                 <div className="insights-data">
                     <h2>Safety Insights for {selectedState?.label || selectedCity?.label || 'Select a Location'}</h2>
+                    {dataType === 'crime' && selectedCity && (
+                        <p className="chart-description">
+                            Showing top 10 most frequent crimes in {selectedCity.label}. 
+                            Chart displays actual crime incident counts. Hover over bars for full crime descriptions.
+                        </p>
+                    )}
                     <div className="data-visualization">
                         {dataType === 'accidents' ? (
                             <Line data={accidentChartData} options={getChartOptions()} />

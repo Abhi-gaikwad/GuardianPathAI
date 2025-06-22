@@ -26,7 +26,7 @@ const About = () => {
         const animateStats = () => {
             statsRef.current.forEach((stat, index) => {
                 if (stat) {
-                    const finalValue = [50000, 99.5, 24, 150][index];
+                    const finalValue = [5000, 99.5, 24, 150][index];
                     const suffix = ['', '%', '/7', '+'][index];
                     let currentValue = 0;
                     const increment = finalValue / 100;
@@ -42,7 +42,7 @@ const About = () => {
                             ? currentValue.toFixed(1) 
                             : Math.floor(currentValue).toLocaleString();
                         stat.textContent = displayValue + suffix;
-                    }, 20);
+                    }, 40);
                 }
             });
         };
