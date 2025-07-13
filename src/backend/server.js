@@ -64,12 +64,23 @@ app.use(session({
 
 // ✅ CORS configuration with PATCH method included
 app.use(cors({
-  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"], // Localhost and deployed
-  credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // ✅ PATCH added here
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"], // REMOVE the trailing slash
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],        // ADD 'PATCH' here
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
+
+app.options('*', cors());
+
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests globally
 
 // ✅ Enable preflight for all routes
 app.options('*', cors({
