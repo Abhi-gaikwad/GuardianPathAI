@@ -119,8 +119,10 @@ const Profile = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true  // ✅ This is required!
         }
       );
+
 
       // Update form data with response
       setFormData(response.data);
