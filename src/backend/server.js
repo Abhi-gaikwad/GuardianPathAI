@@ -35,10 +35,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000"], // Support both localhost formats
+  origin: ["https://pathbuddy.onrender.com/", "http://127.0.0.1:3000"], // Support both localhost formats
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
@@ -61,6 +61,24 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24, // 1 day
   },
 }));
+
+// ✅ CORS configuration with PATCH method included
+app.use(cors({
+  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"], // Localhost and deployed
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // ✅ PATCH added here
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// ✅ Enable preflight for all routes
+app.options('*', cors({
+  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 
 // Request logging middleware (helpful for debugging)
 app.use((req, res, next) => {
