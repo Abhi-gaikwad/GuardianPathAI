@@ -310,6 +310,7 @@ router.post("/auth/phone/verify-otp", async (req, res) => {
 // ============ PROFILE ROUTES ============
 
 // Get user profile
+// router.get("/profile/:uniqueId", getUserProfile);
 router.get("/profile/:uniqueId", getUserProfile);
 
 // Update user profile (with optional profile picture)

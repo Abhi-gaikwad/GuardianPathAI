@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const crypto = require('crypto');
+const path = require('path');
 
 // Helper function to generate unique ID
 const generateUniqueId = () => {
@@ -156,12 +157,12 @@ const signInUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const { uniqueId } = req.params;
-    
+
     if (!uniqueId || uniqueId.trim() === '') {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       uniqueId: uniqueId.trim(),
       isActive: true
     }).select("-password");
@@ -170,20 +171,16 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Handle profile image URL
+    // Convert image path to full URL if needed
     if (user.profileImage && !user.profileImage.startsWith('http')) {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      user.profileImage = `${baseUrl}/uploads/profiles/${path.basename(user.profileImage)}`;
+      user.profileImage = `${baseUrl}${user.profileImage}`;
     }
 
     res.status(200).json(user);
-
   } catch (error) {
     console.error("Error fetching user profile:", error);
-    res.status(500).json({ 
-      message: "Server error", 
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Failed to fetch profile'
-    });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
