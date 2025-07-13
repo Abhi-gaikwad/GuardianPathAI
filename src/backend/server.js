@@ -8,6 +8,7 @@ const fs = require("fs");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
+require("dotenv").config(); 
 
 const app = express();
 

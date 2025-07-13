@@ -1,58 +1,28 @@
-// const mongoose = require("mongoose");
-
-// const userSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true },
-//     email: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     mobile: { type: String, required: true },
-//     emergencyMobile: { type: String, required: true },
-//     uniqueId: { type: String, required: true, unique: true }, // Add uniqueId field
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model("User", userSchema);
-
-
-// const mongoose = require("mongoose");
-
-// const userSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true },
-//     email: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     mobile: { type: String, required: true },
-//     emergencyMobile: { type: String, required: true },
-//     uniqueId: { type: String, required: true, unique: true },
-    
-//     // 👇 Add this field to store image as URL or Base64 string
-//     profileImage: { type: String, default: "" }, // Optional: can also add `required: true` if needed
-//   },
-//   { timestamps: true }
-// );
-
-// module.exports = mongoose.model("User", userSchema);
-
-
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { 
+      type: String, 
+      required: true,
+      trim: true
+    },
     email: { 
       type: String, 
       required: function() {
         return this.authProvider === 'email' || this.authProvider === 'google';
       },
       unique: true,
-      sparse: true // Allow null/undefined values for phone auth
+      sparse: true,
+      lowercase: true,
+      trim: true
     },
     password: { 
       type: String, 
       required: function() {
         return this.authProvider === 'email';
-      }
+      },
+      minlength: 6
     },
     mobile: { 
       type: String, 
@@ -60,23 +30,26 @@ const userSchema = new mongoose.Schema(
         return this.authProvider === 'phone';
       },
       unique: true,
-      sparse: true // Allow null/undefined values for email/google auth initially
+      sparse: true,
+      trim: true
     },
     emergencyMobile: { 
       type: String, 
-      default: "" 
+      default: "",
+      trim: true
     },
     uniqueId: { 
       type: String, 
       required: true, 
-      unique: true 
+      unique: true,
+      index: true
     },
     profileImage: { 
       type: String, 
       default: "" 
     },
     
-    // New fields for multi-auth support
+    // Multi-auth support fields
     authProvider: {
       type: String,
       enum: ['email', 'google', 'phone'],
@@ -86,14 +59,18 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
       unique: true,
-      sparse: true // Only for Google auth users
+      sparse: true
     },
     isVerified: {
       type: Boolean,
       default: false
     },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
     
-    // Optional: Track last login and creation method
+    // Tracking fields
     lastLogin: {
       type: Date,
       default: Date.now
@@ -101,6 +78,11 @@ const userSchema = new mongoose.Schema(
     loginCount: {
       type: Number,
       default: 0
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user'
     }
   },
   { 
@@ -108,15 +90,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ mobile: 1 });
-userSchema.index({ googleId: 1 });
-userSchema.index({ uniqueId: 1 });
+// Compound indexes for better performance
+userSchema.index({ email: 1, authProvider: 1 });
+userSchema.index({ mobile: 1, authProvider: 1 });
+userSchema.index({ googleId: 1, authProvider: 1 });
+userSchema.index({ uniqueId: 1, isActive: 1 });
 
-// Pre-save middleware to handle different auth providers
+// Pre-save middleware
 userSchema.pre('save', function(next) {
-  // Ensure required fields based on auth provider
+  // Validate required fields based on auth provider
   if (this.authProvider === 'email' && (!this.email || !this.password)) {
     return next(new Error('Email and password are required for email authentication'));
   }
@@ -129,29 +111,22 @@ userSchema.pre('save', function(next) {
     return next(new Error('Mobile number is required for phone authentication'));
   }
   
-  // Update login count and last login
-  if (this.isModified('lastLogin')) {
-    this.loginCount += 1;
-  }
-  
   next();
 });
 
-// Virtual for full name display
+// Virtual for display name
 userSchema.virtual('displayName').get(function() {
-  return this.name || this.email || this.mobile;
+  return this.name || this.email || this.mobile || 'User';
 });
 
-// Method to check if user needs to complete profile
+// Instance method to check if profile needs completion
 userSchema.methods.needsProfileCompletion = function() {
   const requiredFields = ['name'];
   
-  // For Google users, check if they have mobile numbers
   if (this.authProvider === 'google') {
     requiredFields.push('mobile', 'emergencyMobile');
   }
   
-  // For phone users, check if they have emergency contact
   if (this.authProvider === 'phone') {
     requiredFields.push('emergencyMobile');
   }
@@ -159,13 +134,21 @@ userSchema.methods.needsProfileCompletion = function() {
   return requiredFields.some(field => !this[field] || this[field].trim() === '');
 };
 
-// Method to get safe user data (without sensitive info)
+// Instance method to get safe user data
 userSchema.methods.toSafeObject = function() {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.googleId;
   delete userObject.__v;
   return userObject;
+};
+
+// Instance method to remove sensitive data from JSON
+userSchema.methods.toJSON = function() {
+  const user = this.toObject();
+  delete user.password;
+  delete user.__v;
+  return user;
 };
 
 // Static method to find user by any identifier
@@ -175,8 +158,14 @@ userSchema.statics.findByIdentifier = function(identifier) {
       { email: identifier },
       { mobile: identifier },
       { uniqueId: identifier }
-    ]
+    ],
+    isActive: true
   });
+};
+
+// Static method to find user by uniqueId
+userSchema.statics.findByUniqueId = function(uniqueId) {
+  return this.findOne({ uniqueId, isActive: true });
 };
 
 module.exports = mongoose.model("User", userSchema);

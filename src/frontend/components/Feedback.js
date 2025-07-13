@@ -16,7 +16,9 @@ const Feedback = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get("http://localhost:5000/api/feedbacks");
+      // const response = await axios.get("http://localhost:5000/api/feedbacks");
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE}/api/feedbacks`);
+
       setFeedbackList(response.data);
       console.log(response.data);
     } catch (error) {
