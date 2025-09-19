@@ -63,9 +63,9 @@ const Profile = () => {
     const fetchUserData = async () => {
       
       try {
-        const response = await axios.get(`https://pathbuddy.onrender.com/api/users/profile/${uniqueId}`);
+        // const response = await axios.get(`https://pathbuddy.onrender.com/api/users/profile/${uniqueId}`);
         // console.log("REACT_APP_API_BASE:", process.env.REACT_APP_API_BASE);
-        //  const response = await axios.get(`${process.env.REACT_APP_API_BASE}/api/users/profile/${uniqueId}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE}/api/users/profile/${uniqueId}`);
 
         setFormData(response.data);
         // Set preview URL to the existing profile image
@@ -113,7 +113,7 @@ const Profile = () => {
       }
 
       const response = await axios.patch(
-        `https://pathbuddy.onrender.com/api/users/profile/${uniqueId}`,
+        `${process.env.REACT_APP_API_BASE}/api/users/profile/${uniqueId}`,
         data,
         {
           headers: {
@@ -205,7 +205,7 @@ const Profile = () => {
         return previewImageURL;
       }
       // If it's a relative path, prepend server URL
-      return `https://pathbuddy.onrender.com/${previewImageURL.startsWith('/') ? '' : '/'}${previewImageURL}`;
+      return `${process.env.REACT_APP_API_BASE}/${previewImageURL.startsWith('/') ? '' : '/'}${previewImageURL}`;
     }
     return "";
   };

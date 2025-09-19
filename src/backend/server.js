@@ -30,68 +30,40 @@ if (!fs.existsSync(profilesDir)) {
 }
 
 // Middleware - ORDER MATTERS!
-app.use(express.json({ limit: '10mb' })); // Increased limit for file uploads
+app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
-app.use(cors({
-  origin: ["https://pathbuddy.onrender.com/", "http://127.0.0.1:3000"], // Support both localhost formats
-  credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+// ✅ Clean CORS configuration
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"], 
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Preflight handler
 
-// Serve static files (important for image serving)
+// Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Session middleware
 app.use(session({
-  secret: process.env.SESSION_SECRET || "mysecretkey", // use a secure .env variable for production
+  secret: process.env.SESSION_SECRET || "mysecretkey",
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI || "mongodb://localhost:27017/your_db_name",
     collectionName: "sessions",
-    touchAfter: 24 * 3600 // lazy session update
+    touchAfter: 24 * 3600 
   }),
   cookie: {
     httpOnly: true,
-    secure: false, // set true in production (HTTPS)
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    secure: false, 
+    maxAge: 1000 * 60 * 60 * 24, 
   },
 }));
 
-// ✅ CORS configuration with PATCH method included
-app.use(cors({
-  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"], // REMOVE the trailing slash
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],        // ADD 'PATCH' here
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-app.options('*', cors());
-
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests globally
-
-// ✅ Enable preflight for all routes
-app.options('*', cors({
-  origin: ["http://localhost:3000", "https://pathbuddy.onrender.com"],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
-
-
-// Request logging middleware (helpful for debugging)
+// Request logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
@@ -124,44 +96,31 @@ app.get('/api/test', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Global Error Handler:', err);
   
-  // Multer errors
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ 
-      message: "File too large. Maximum size is 5MB." 
-    });
+    return res.status(400).json({ message: "File too large. Maximum size is 5MB." });
   }
   
   if (err.message === 'Only image files are allowed!') {
-    return res.status(400).json({ 
-      message: "Only image files are allowed." 
-    });
+    return res.status(400).json({ message: "Only image files are allowed." });
   }
   
-  // MongoDB errors
   if (err.code === 11000) {
     const field = Object.keys(err.keyPattern)[0];
-    return res.status(409).json({ 
-      message: `${field} already exists` 
-    });
+    return res.status(409).json({ message: `${field} already exists` });
   }
   
-  // Validation errors
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(e => e.message);
-    return res.status(400).json({ 
-      message: "Validation failed", 
-      errors 
-    });
+    return res.status(400).json({ message: "Validation failed", errors });
   }
   
-  // Default error
   res.status(500).json({ 
     message: "Internal server error", 
     error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   });
 });
 
-// 404 handler for undefined routes
+// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ 
     message: `Route ${req.method} ${req.originalUrl} not found`,
@@ -185,7 +144,6 @@ app.use('*', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Start server with proper error handling
 const server = app.listen(PORT, (err) => {
   if (err) {
     console.error('❌ Failed to start server:', err);
